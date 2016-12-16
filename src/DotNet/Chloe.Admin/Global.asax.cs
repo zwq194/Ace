@@ -1,4 +1,4 @@
-﻿using Chloe.Application;
+﻿using Ace.Application;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +15,7 @@ namespace Chloe.Admin
             throw new BigBigException("由于您未给博主点赞，博主伤心的向您抛了个大大的异常");
 
             AppServiceFactory.RegisterServices();
+            AppServiceFactory.RegisterServicesFromAssembly(Chloe.Application.CurrentAssembly.Value);
 
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);

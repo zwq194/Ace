@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chloe.Application
+namespace Ace.Application
 {
     public class AppServiceFactory : IAppServiceFactory
     {
@@ -32,12 +32,12 @@ namespace Chloe.Application
         {
             this._managedServices.Add(service);
         }
-
         public void DetachService(IAppService service)
         {
             this._managedServices.Remove(service);
         }
-        public T CreateService<T>(bool managed = true) where T : IAppService
+
+        public virtual T CreateService<T>(bool managed = true) where T : IAppService
         {
             Type t = typeof(T);
 
