@@ -84,6 +84,11 @@
 .wrapper .pop-list label{line-height: 30px;display: block;float: left;min-width: 100px;height: 30px;padding: 5px 0;padding-right:15px;}
 .wrapper .pop-list li .form-control{float: left;width: 300px;margin-right: 5px;line-height: 30px;height: 30px;padding:0px;padding-left:5px;margin-top:3px;border-radius: 3px;box-shadow:none;resize: none;}
 
+/* 设置bootstrap表格div的最小宽度，不然，在小屏显示器下会出现变形 */
+.table-responsive {
+min-width:850px;
+}
+
 /* start fx-page */
 .fx-page {
     display: inline-block;
