@@ -14,8 +14,6 @@ namespace Chloe.Home
     {
         protected void Application_Start()
         {
-            throw new BigBigException("由于您未给博主点赞，博主伤心的向您抛了个大大的异常");
-
             AppServiceFactory.RegisterServices();
             AppServiceFactory.RegisterServicesFromAssembly(Chloe.Application.CurrentAssembly.Value);
 
@@ -29,13 +27,5 @@ namespace Chloe.Home
         //protected void Application_Error()
         //{
         //}
-    }
-
-    public class BigBigException : Exception
-    {
-        public BigBigException(string msg)
-            : base(msg)
-        {
-        }
     }
 }
