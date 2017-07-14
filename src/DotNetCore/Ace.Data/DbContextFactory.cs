@@ -21,7 +21,6 @@ using Chloe.SQLite;
 using Chloe.SqlServer;
 using System;
 using System.Collections.Generic;
-//using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,7 +29,6 @@ namespace Ace.Data
 {
     public class DbContextFactory
     {
-        //public const string DefaultConnectionStringName = "connString";
         public static string ConnectionString { get; private set; }
         public static string DbType { get; private set; }
         static DbContextFactory()
@@ -40,6 +38,11 @@ namespace Ace.Data
             string dbType = Globals.Configuration["db:DbType"];
             if (string.IsNullOrEmpty(dbType) == false)
                 DbType = dbType.ToLower();
+
+#if DEBUG
+            IDbCommandInterceptor interceptor = new DbCommandInterceptor();
+            DbInterception.Add(interceptor);
+#endif
         }
         public static IDbContext CreateContext()
         {
@@ -70,11 +73,6 @@ namespace Ace.Data
             {
                 dbContext = CreateSqlServerContext(connString);
             }
-
-#if DEBUG
-            IDbCommandInterceptor interceptor = new DbCommandInterceptor();
-            DbInterception.Add(interceptor);
-#endif
 
             return dbContext;
         }
