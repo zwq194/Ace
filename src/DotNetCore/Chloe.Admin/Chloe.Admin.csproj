@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="weblog\**" />
+    <Content Remove="weblog\**" />
+    <EmbeddedResource Remove="weblog\**" />
+    <None Remove="weblog\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Common\HtmlDialog.cs" />
+    <Compile Remove="Common\VerifyCodeHelper.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Session" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="1.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="1.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.1.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="1.1.2" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="4.4.1" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Ace.Application.System\Ace.Application.System.csproj" />
+    <ProjectReference Include="..\Ace.Application.Wiki\Ace.Application.Wiki.csproj" />
+    <ProjectReference Include="..\Ace.Application\Ace.Application.csproj" />
+    <ProjectReference Include="..\Ace.AutoMapper\Ace.AutoMapper.csproj" />
+    <ProjectReference Include="..\Ace.Entity.Wiki\Ace.Entity.Wiki.csproj" />
+    <ProjectReference Include="..\Ace.Entity\Ace.Entity.csproj" />
+    <ProjectReference Include="..\Ace.Web.Mvc\Ace.Web.Mvc.csproj" />
+    <ProjectReference Include="..\Ace.Web\Ace.Web.csproj" />
+    <ProjectReference Include="..\Ace\Ace.csproj" />
+    <ProjectReference Include="..\DotNetEx\DotNetEx.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="configs\hosting.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="configs\nlog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

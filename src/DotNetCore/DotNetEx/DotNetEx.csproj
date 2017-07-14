@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.6</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Extensions\DataReaderExtension.cs" />
+    <Compile Remove="Extensions\DbConnectionExtension.cs" />
+    <Compile Remove="Extensions\SqlConnectionExtension.cs" />
+    <Compile Remove="Extensions\WebResponseExtension.cs" />
+    <Compile Remove="Helpers\BinaryFormatterHelper.cs" />
+    <Compile Remove="Helpers\HttpHelper.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ChloeCore.Extension" Version="1.3.0" />
+    <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.4.0-preview1-25305-02" />
+  </ItemGroup>
+
+</Project>
