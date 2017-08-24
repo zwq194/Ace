@@ -57,6 +57,12 @@ namespace Chloe.Home
 
             services.AddSession();
             services.AddResponseCaching(); //https://docs.microsoft.com/en-us/aspnet/core/performance/caching/response
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            }).AddCookie();
+
             services.AddMvc(options =>
             {
                 options.Filters.Add(typeof(HttpGlobalExceptionFilter));
@@ -94,11 +100,7 @@ namespace Chloe.Home
 
             app.UseStaticFiles();
 
-            app.UseCookieAuthentication(new CookieAuthenticationOptions
-            {
-                AuthenticationScheme = CookieAuthenticationDefaults.AuthenticationScheme,
-                AutomaticAuthenticate = true,
-            });
+            app.UseAuthentication();
 
 
             app.UseSession();

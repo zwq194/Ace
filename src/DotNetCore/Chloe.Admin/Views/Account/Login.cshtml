@@ -17,9 +17,10 @@
     <![endif]-->
 </head>
 <body>
-    <div style="position: absolute; z-index: 999; top: 20px; left: 20px; color: #fff; font-size: 13px; line-height: 22px;">
-            用户名 admin ，密码 52chloe。
-        </div>
+    @*<div style="position: absolute; z-index: 999; top: 20px; left: 20px; color: #fff; font-size: 13px; line-height: 22px;">
+            在线体验，基于阿里巴巴云主机，采用独立运行环境，提供持续稳定安全服务，24小时均可以访问<br>
+            用户名 admin ，密码 52chloe。请勿在系统内发表不文明信息，也恳请大家别乱删除系统内已有的菜单，谢谢！
+        </div>*@
 
     <div class="wrapper">
         <div class="container">
@@ -36,13 +37,13 @@
                     <input id="txt_password" type="password" placeholder="登录密码">
                     <i class="fa fa-key"></i>
                 </div>
-                @*<div class="row">
+                <div class="row">
                     <input id="txt_code" maxlength="4" type="text" placeholder="验证码" style="width: 190px; float: left;">
                     <div style="width: 110px; float: right; padding-top: 14px; padding-left: 14px;">
                         看不清？<a id="switchCode" href="javascript:void();" style="text-decoration: none;">换一张</a>
-                        <img id="imgcode" class="authcode" src="@this.Href("~/Account/VerifyCode")" width=" 80" height="25" />
+                        @*<img id="imgcode" class="authcode" src="@this.Href("~/Account/VerifyCode")" width=" 80" height="25" />*@
                     </div>
-                </div>*@
+                </div>
                 <div class="row">
                     <button id="login_button" type="button"><span>登录</span></button>
                 </div>
@@ -129,7 +130,7 @@
                         $(".container").css("margin-top", ($(window).height() - $(".container").height()) / 2 - 50);
                     });
                     $("#switchCode").click(function () {
-                        //$("#imgcode").attr("src", "@this.Url.Content("~/Account/VerifyCode?t=")" + Math.random());
+                        $("#imgcode").attr("src", "@this.Url.Content("~/Account/VerifyCode?t=")" + Math.random());
                     });
                     var login_error = top.$.cookie('nfine_login_error');
                     if (login_error != null) {

@@ -66,7 +66,7 @@ namespace Chloe.Admin.Controllers
             session.LoginIP = ip;
             session.LoginTime = DateTime.Now;
             session.IsAdmin = user.UserName.ToLower() == AppConsts.AdminUserName;
-
+            
             this.CurrentSession = session;
 
             this.CreateService<ISysLogAppService>().LogAsync(user.Id, user.RealName, ip, LogType.Login, moduleName, true, "登录成功");

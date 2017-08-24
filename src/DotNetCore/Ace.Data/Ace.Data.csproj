@@ -1,15 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.6</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ChloeCore.Extension" Version="1.3.0" />
-    <PackageReference Include="ChloeCore.MySql" Version="2.12.0" />
-    <PackageReference Include="ChloeCore.Oracle" Version="2.12.0" />
-    <PackageReference Include="ChloeCore.SQLite" Version="2.12.0" />
-    <PackageReference Include="ChloeCore.SqlServer" Version="2.12.0" />
+    <PackageReference Include="ChloeCore.Extension" Version="1.4.0" />
+    <PackageReference Include="ChloeCore.MySql" Version="2.15.0" />
+    <PackageReference Include="ChloeCore.Oracle" Version="2.15.0" />
+    <PackageReference Include="ChloeCore.SQLite" Version="2.15.0" />
+    <PackageReference Include="ChloeCore.SqlServer" Version="2.15.0" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="1.1.1" />
     <PackageReference Include="MySql.Data" Version="7.0.7-m61" />
   </ItemGroup>

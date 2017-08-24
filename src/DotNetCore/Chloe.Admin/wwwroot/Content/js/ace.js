@@ -40,6 +40,17 @@ Array.prototype.select = function (selector) {
     }
     return retArr;
 };
+Array.prototype.first = function (predicate) {
+    var arr = this;
+    var retArr = [];
+    for (var i = 0; i < arr.length; i++) {
+        var item = arr[i];
+        if (predicate(item)) {
+            return item;
+        }
+    }
+    return retArr;
+};
 
 /* $ace */
 (function ($) {
@@ -314,6 +325,33 @@ Array.prototype.select = function (selector) {
         return ret;
     };
 
+    $.fn.checked = function (value) {
+        if (value == true)
+            value = "true";
+        else if (value == false)
+            value = "false";
+
+        for (var j = 0; j < this.length; j++) {
+            var ele = this[j];
+            if (value === undefined || value === null)
+                ele.checked = true;
+            else {
+                if (ele.value == value)
+                    ele.checked = true;
+            }
+        }
+    }
+    $.fn.checkedValue = function () {
+        for (var j = 0; j < this.length; j++) {
+            var ele = this[j];
+            if (ele.checked == true) {
+                return ele.value;
+            }
+        }
+
+        return null;
+    }
+
     $.fn.formValid = function () {
         return $(this).valid({
             errorPlacement: function (error, element) {
@@ -332,6 +370,100 @@ Array.prototype.select = function (selector) {
         });
     }
 
+    $.fn.getFormData = function () {
+        var element = $(this);
+        var model = {};
+        element.find('input,select,textarea').each(function (r) {
+            var $this = $(this);
+            var name = $this.attr('name');
+            var type = $this.attr('type');
+            switch (type) {
+                case "checkbox":
+                    model[name] = $this.is(":checked");
+                    break;
+                case "radio":
+                    if (model[name] === undefined)
+                        model[name] = null;
+                    if (this.checked == true)
+                        model[name] = this.value;
+                    break;
+                default:
+                    var value = $this.val();
+                    model[name] = value;
+                    break;
+            }
+        });
+        if ($('[name=__RequestVerificationToken]').length > 0) {
+            model["__RequestVerificationToken"] = $('[name=__RequestVerificationToken]').val();
+        }
+        return model;
+    };
+    $.fn.setFormData = function (data) {
+        var element = $(this);
+        element.find('input,select,textarea').each(function (r) {
+            var $ele = $(this);
+            var name = $ele.attr('name');
+            var type = $ele.attr('type');
+
+            var value = null;
+            if (name in data)
+                value = data[name];
+
+            switch (type) {
+                case "checkbox":
+                    /* 先不管，回头在搞 */
+                    //model[name] = $this.is(":checked");
+                    break;
+                case "radio":
+                    if (value == true)
+                        value = "true";
+                    else if (value == false)
+                        value = "false";
+                    this.checked = this.value == value;
+                    break;
+                case "select":
+                    $ele.val(value).trigger("change");
+                    break;
+                default:
+                    $ele.val(value);
+                    break;
+            }
+        });
+    };
+
+    $.fn.bindSelect = function (options) {
+        var defaults = {
+            value: "Id",
+            text: "Name",
+            change: null,
+            items: [],
+            placeholder: "--请选择--"
+        };
+        var options = $.extend(defaults, options);
+        var $element = $(this);
+
+        if (options.placeholder !== null && options.placeholder !== undefined)
+            $element.append($("<option></option>").val("").html(options.placeholder));
+
+        items = options.items;
+        $.each(items, function (i) {
+            $element.append($("<option></option>").val(items[i][options.value]).html(items[i][options.text]));
+        });
+
+        if (options.change)
+            $element.change(options.change);
+
+        return;
+    }
+
+    $.fn.disable = function () {
+        var $element = $(this);
+        $element.attr("disabled", "disabled");
+    }
+    $.fn.enable = function () {
+        var $element = $(this);
+        $element.removeAttr("disabled");
+    }
 })($);
 
 

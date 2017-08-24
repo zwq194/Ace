@@ -60,53 +60,6 @@ namespace System
             string typeName = type.Name;
             return typeName.Contains("<>") && typeName.Contains("__") && typeName.Contains("AnonymousType");
         }
-        public static bool IsClass(this Type type)
-        {
-            return type.GetTypeInfo().IsClass;
-        }
-        public static bool IsAbstract(this Type type)
-        {
-            return type.GetTypeInfo().IsAbstract;
-        }
-        public static bool IsInterface(this Type type)
-        {
-            return type.GetTypeInfo().IsInterface;
-        }
-        public static bool IsAbstractOrInterface(this Type type)
-        {
-            TypeInfo typeInfo = type.GetTypeInfo();
-            return typeInfo.IsAbstract || typeInfo.IsInterface;
-        }
-        public static bool IsEnum(this Type type)
-        {
-            return type.GetTypeInfo().IsEnum;
-        }
-        public static bool IsValueType(this Type type)
-        {
-            return type.GetTypeInfo().IsValueType;
-        }
-        public static bool IsGenericType(this Type type)
-        {
-            return type.GetTypeInfo().IsGenericType;
-        }
-
-
-        public static IEnumerable<TAttribute> GetCustomAttributes<TAttribute>(this Type type)
-        {
-            return type.GetTypeInfo().GetCustomAttributes(typeof(TAttribute)).Cast<TAttribute>();
-        }
-        public static IEnumerable<TAttribute> GetCustomAttributes<TAttribute>(this Type type, bool inherit)
-        {
-            return type.GetTypeInfo().GetCustomAttributes(typeof(TAttribute), inherit).Cast<TAttribute>();
-        }
-        public static bool IsDefined(this Type type, Type attributeType)
-        {
-            return type.GetTypeInfo().IsDefined(attributeType);
-        }
-        public static bool IsDefined(this Type type, Type attributeType, bool inherit)
-        {
-            return type.GetTypeInfo().IsDefined(attributeType, inherit);
-        }
 
         public static object GetDefaultValue(this Type type)
         {

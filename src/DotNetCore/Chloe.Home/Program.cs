@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using System.Text;
+using Microsoft.AspNetCore;
 
 namespace Chloe.Home
 {
@@ -17,16 +18,11 @@ namespace Chloe.Home
 
             string contentRoot = Directory.GetCurrentDirectory();
 
-            //http://www.cnblogs.com/chenchuxin/archive/2017/04/26/6771427.html
-            //http://www.cnblogs.com/frankyou/archive/2016/07/22/5695214.html
-
-            var host = new WebHostBuilder()
-                .UseKestrel()
+            var hostBuilder = WebHost.CreateDefaultBuilder(args);
+            var host = hostBuilder
                 .BindUrls(args, contentRoot)
                 .UseContentRoot(contentRoot)
-                .UseIISIntegration()
                 .UseStartup<Startup>()
-                .UseApplicationInsights()
                 .Build();
 
             host.Run();

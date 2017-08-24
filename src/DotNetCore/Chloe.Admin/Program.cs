@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore;
 
 namespace Chloe.Admin
 {
@@ -16,13 +17,11 @@ namespace Chloe.Admin
 
             string contentRoot = Directory.GetCurrentDirectory();
 
-            var host = new WebHostBuilder()
-                .UseKestrel()
+            var hostBuilder = WebHost.CreateDefaultBuilder(args);
+            var host = hostBuilder
                 .BindUrls(args, contentRoot)
                 .UseContentRoot(contentRoot)
-                .UseIISIntegration()
                 .UseStartup<Startup>()
-                .UseApplicationInsights()
                 .Build();
 
             host.Run();

@@ -20,6 +20,7 @@ using System.Text;
 using Ace.Web.Mvc;
 using NLog.Extensions.Logging;
 using NLog.Web;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Chloe.Admin
 {
@@ -55,7 +56,16 @@ namespace Chloe.Admin
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.RegisterAppServices(); /* 注册应用服务 */
 
+            /* 缓存 */
+            services.AddMemoryCache();
+
             services.AddSession();
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            }).AddCookie();
+
             services.AddMvc(options =>
             {
                 options.Filters.Add(typeof(HttpGlobalExceptionFilter));
@@ -93,12 +103,7 @@ namespace Chloe.Admin
 
             app.UseStaticFiles();
 
-            app.UseCookieAuthentication(new CookieAuthenticationOptions
-            {
-                AuthenticationScheme = CookieAuthenticationDefaults.AuthenticationScheme,
-                AutomaticAuthenticate = true,
-            });
-
+            app.UseAuthentication();
 
             app.UseSession();
 

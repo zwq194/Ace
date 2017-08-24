@@ -14,7 +14,7 @@ using Ace;
 using System.Reflection;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http.Authentication;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Chloe.Admin.Common
 {
@@ -72,7 +72,7 @@ namespace Chloe.Admin.Common
                 if (session == null)
                 {
                     //注销登录
-                    this.HttpContext.Authentication.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    this.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                     return;
                 }
 
@@ -80,15 +80,20 @@ namespace Chloe.Admin.Common
 
                 //init the identity instances 
                 var userPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
-                //Microsoft.AspNetCore.Http.Features.Authentication.IAuthenticationHandler
-                //Microsoft.AspNetCore.Http.Authentication.Internal.DefaultAuthenticationManager
-                //signin 
-                HttpContext.Authentication.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, userPrincipal, new AuthenticationProperties
+                this.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, userPrincipal, new AuthenticationProperties
                 {
                     ExpiresUtc = DateTime.UtcNow.AddMinutes(60),
                     IsPersistent = false,
                     AllowRefresh = false
                 });
+
+                //IAuthenticationService authenticationService = this.HttpContext.RequestServices.GetService(typeof(IAuthenticationService)) as IAuthenticationService;
+                //authenticationService.SignInAsync(this.HttpContext, CookieAuthenticationDefaults.AuthenticationScheme, userPrincipal, new AuthenticationProperties
+                //{
+                //    ExpiresUtc = DateTime.UtcNow.AddMinutes(60),
+                //    IsPersistent = false,
+                //    AllowRefresh = false
+                //});
 
                 if (this._appServicesFactory != null)
                 {
