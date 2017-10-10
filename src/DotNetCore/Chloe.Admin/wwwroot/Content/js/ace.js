@@ -376,7 +376,12 @@ Array.prototype.first = function (predicate) {
         element.find('input,select,textarea').each(function (r) {
             var $this = $(this);
             var name = $this.attr('name');
+
+            if (!name)
+                return;
+
             var type = $this.attr('type');
+
             switch (type) {
                 case "checkbox":
                     model[name] = $this.is(":checked");
@@ -386,6 +391,8 @@ Array.prototype.first = function (predicate) {
                         model[name] = null;
                     if (this.checked == true)
                         model[name] = this.value;
+                    break;
+                case "button":
                     break;
                 default:
                     var value = $this.val();
@@ -403,6 +410,10 @@ Array.prototype.first = function (predicate) {
         element.find('input,select,textarea').each(function (r) {
             var $ele = $(this);
             var name = $ele.attr('name');
+
+            if (!name)
+                return;
+
             var type = $ele.attr('type');
 
             var value = null;
@@ -423,6 +434,8 @@ Array.prototype.first = function (predicate) {
                     break;
                 case "select":
                     $ele.val(value).trigger("change");
+                    break;
+                case "button":
                     break;
                 default:
                     $ele.val(value);

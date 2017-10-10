@@ -103,7 +103,7 @@
             throw new Error("Browser doesn't support addEventListener or attachEvent");
     }
 
-    //version = "2.2.0rc" 版KO内部实现方式
+    //KO内部实现方式
     function writeValueToProperty(property, allBindingsAccessor, key, value) {
         if (!property || !ko.isWriteableObservable(property)) {
             var propWriters = allBindingsAccessor()['_ko_property_writers'];
@@ -114,11 +114,31 @@
         }
     }
 
+    function set_twoWayBindings(key) {
+        /* 
+         * ko.version>=3.0 需要设置 ko.expressionRewriting._twoWayBindings[key] = true，否则不支持 _ko_property_writers 属性
+         * https://stackoverflow.com/questions/22991814/ko-bindinghandlers-datepicker-not-working-for-knockout-version-3-0
+        */
+        if ("expressionRewriting" in ko) {
+            if ("_twoWayBindings" in ko.expressionRewriting) {
+                ko.expressionRewriting._twoWayBindings[key] = true;
+            }
+        }
+    }
+
+    set_twoWayBindings('dateString');
     ko.bindingHandlers['dateString'] = {
         'init': function (element, valueAccessor, allBindingsAccessor) {
             if (element.nodeName != "INPUT") {
                 return;
             }
+
+            var pattern = allBindingsAccessor().datePattern || "yyyy-MM-dd";
+            $(element).click(function () {
+                //My97DatePicker
+                if (WdatePicker !== undefined)
+                    WdatePicker({ dateFmt: pattern });
+            });
 
             var valueUpdateHandler = function () {
                 var modelValue = valueAccessor();
@@ -168,6 +188,8 @@
             }
         }
     }
+
+    set_twoWayBindings('boolString');
     ko.bindingHandlers['boolString'] = {
         'init': function (element, valueAccessor, allBindingsAccessor) {
             if (element.nodeName != "INPUT") {
@@ -222,6 +244,8 @@
             }
         }
     }
+
+    set_twoWayBindings('boolChecked');
     ko.bindingHandlers['boolChecked'] = {
         'init': function (element, valueAccessor, allBindingsAccessor) {
             if (element.nodeName != "INPUT" || element.type != 'radio') {
@@ -265,6 +289,8 @@
             }
         }
     }
+
+    set_twoWayBindings('typedChecked');
     ko.bindingHandlers['typedChecked'] = {
         'init': function (element, valueAccessor, allBindingsAccessor) {
             var dataType = allBindingsAccessor().dataType || "string";

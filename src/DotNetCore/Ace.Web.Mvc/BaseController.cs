@@ -74,7 +74,7 @@ namespace Ace.Web.Mvc
                 if (searchType == TypeOfCurrent)
                     break;
                 else
-                    searchType = searchType.GetTypeInfo().BaseType;
+                    searchType = searchType.BaseType;
             }
 
             foreach (var pro in properties)
