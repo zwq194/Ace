@@ -40,14 +40,22 @@ namespace Ace.Web.Mvc
             output.PostContent.AppendLine();
             output.PostContent.AppendText("               </div>");
             output.PostContent.AppendLine();
-            output.PostContent.AppendText("               <div class=\"modal-footer\">");
-            output.PostContent.AppendLine();
-            output.PostContent.AppendText("                    <button type=\"button\" class=\"btn btn-default\" data-bind=\"click:Save\">保存</button>");
-            output.PostContent.AppendLine();
-            output.PostContent.AppendText("                    <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\" data-bind=\"click:function(){ IsShow(false);}\">关闭</button>");
-            output.PostContent.AppendLine();
-            output.PostContent.AppendText("               </div>");
-            output.PostContent.AppendLine();
+
+
+            bool noFooter = output.Attributes.Where(a => a.Name == "no-footer").FirstOrDefault() != null;
+            if (!noFooter)
+            {
+                output.PostContent.AppendText("               <div class=\"modal-footer\">");
+                output.PostContent.AppendLine();
+                output.PostContent.AppendText("                    <button type=\"button\" class=\"btn btn-default\" data-bind=\"click:Save\">保存</button>");
+                output.PostContent.AppendLine();
+                output.PostContent.AppendText("                    <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\" data-bind=\"click:function(){ IsShow(false);}\">关闭</button>");
+                output.PostContent.AppendLine();
+                output.PostContent.AppendText("               </div>");
+                output.PostContent.AppendLine();
+            }
+
+
             output.PostContent.AppendText("           </div>");
             output.PostContent.AppendLine();
 

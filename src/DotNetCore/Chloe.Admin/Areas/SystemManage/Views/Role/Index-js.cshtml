@@ -39,6 +39,7 @@
         var me = this;
         DialogBase.call(me);
 
+        initControl();
 
         me.OnOpen = function () {
             var model = me.EditModel();
@@ -49,8 +50,6 @@
             else {
                 me.Model({ IsEnabled: true });
             }
-
-            initControl();
 
             var roleId = me.Model().Id;
             $("#permissionTree").html(null);
@@ -63,11 +62,11 @@
             });
         }
         me.OnSave = function () {
-            var model = me.Model();
-
             if (!$('#form1').formValid()) {
                 return false;
             }
+
+            var model = me.Model();
 
             var permissionIdArr = $("#permissionTree").getCheckedNodes();
             var permissionIds = "";

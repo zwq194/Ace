@@ -2,7 +2,6 @@
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_LayoutPage.cshtml";
 }
-
 @this.Partial("Index-js")
 @this.RefStyle("~/Content/wdtree/tree.css")
 @this.RefScript("~/Content/wdtree/tree.js")
@@ -10,7 +9,6 @@
 @this.RefScript("~/Content/select2/select2.min.js")
 @this.RefStyle("~/Content/wizard/wizard.css")
 @this.RefScript("~/Content/wizard/wizard.js")
-
 
 <div class="topPanel">
     <div class="toolbar">
@@ -22,7 +20,6 @@
             <button class="btn btn-primary" data-bind="click:Delete,attr:{disabled:!DataTable.SelectedModel()}"><i class="fa fa-trash-o"></i>删除</button>
             <button class="btn btn-primary" data-bind="click:Add"><i class="fa fa-plus"></i>添加</button>
         </div>
-
     </div>
     <div class="search">
         <table>
@@ -40,7 +37,6 @@
     </div>
 </div>
 
-
 <div class="table-responsive">
     <table class="table table-hover" data-bind="with:DataTable">
         <thead>
@@ -54,7 +50,6 @@
                 <th>备注</th>
             </tr>
         </thead>
-
         <tbody data-bind="foreach:Models">
             <tr data-bind="click:$parent.SelectRow">
                 <td data-bind="text:$parent.GetOrdinal($index())"></td>
@@ -69,11 +64,8 @@
     </table>
 </div>
 
-
-<dialogbox data-bind="with:Dialog">
-
+<dialogbox data-bind="with:Dialog" no-footer="true">
     <div class="modal-body">
-
 
         <form id="form1">
             <div class="widget-body">
@@ -107,7 +99,6 @@
                                             <input id="EnCode" name="EnCode" type="text" class="form-control required" placeholder="请输入角色编号" data-bind="value:Model().EnCode" />
                                         </td>
                                     </tr>
-
                                     <tr>
                                         <th class="formTitle">显示顺序</th>
                                         <td class="formValue">
@@ -139,9 +130,7 @@
                 </div>
             </div>
         </form>
-
     </div>
-
     <div class="modal-footer" id="wizard-actions">
         <a id="btn_last" disabled class="btn btn-default btn-prev">上一步</a>
         <a id="btn_next" class="btn btn-default btn-next">下一步</a>
@@ -150,6 +139,5 @@
             <button id="btn_next" type="button" class="btn btn-default btn-next">下一步</button>
             <button type="button" class="btn btn-default" data-dismiss="modal" data-bind="click:function(){ IsShow(false);}">完成</button>*@
     </div>
-
 
 </dialogbox>
