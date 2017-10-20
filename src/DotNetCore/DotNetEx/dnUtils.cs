@@ -70,9 +70,10 @@ namespace System
         {
             List<List<T>> batches = new List<List<T>>();
 
-            List<T> batch = new List<T>();
-            foreach (var item in source)
+            List<T> batch = new List<T>(source.Count > batchSize ? batchSize : source.Count);
+            for (int i = 0; i < source.Count; i++)
             {
+                var item = source[i];
                 batch.Add(item);
                 if (batch.Count >= batchSize)
                 {

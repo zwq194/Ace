@@ -200,7 +200,7 @@ namespace Chloe
                     object updationTime = propertyMap.SourceMember.GetMemberValue(dto);
                     if (updationTime.IsDefaultValueOfType(propertyMap.SourceMember.GetMemberType())) /* 表示未设置更新时间，此时我们使用 DateTime.Now */
                     {
-                        var updationTimeExp = Utils.MakeWrapperAccess(DateTime.Now, propertyMap.DestinationProperty.GetMemberType());
+                        var updationTimeExp = Chloe.Extensions.ExpressionExtension.MakeWrapperAccess(DateTime.Now, propertyMap.DestinationProperty.GetMemberType());
                         bind = Expression.Bind(propertyMap.DestinationProperty, updationTimeExp);
                     }
                 }
@@ -222,7 +222,7 @@ namespace Chloe
             {
                 throw new ArgumentException("未能从 dto 中找到主键或主键为空");
             }
-            
+
             return dbContext.Update<TEntity>(key, bindings);
         }
 
@@ -304,7 +304,7 @@ namespace Chloe
             foreach (var keyValue in keyValueMap)
             {
                 Expression propOrField = Expression.PropertyOrField(parameter, keyValue.Key.Name);
-                Expression wrappedValue = Utils.MakeWrapperAccess(keyValue.Value, keyValue.Key.GetMemberType());
+                Expression wrappedValue = Chloe.Extensions.ExpressionExtension.MakeWrapperAccess(keyValue.Value, keyValue.Key.GetMemberType());
                 Expression e = Expression.Equal(propOrField, wrappedValue);
                 lambdaBody = lambdaBody == null ? e : Expression.AndAlso(lambdaBody, e);
             }
@@ -346,7 +346,7 @@ namespace Chloe
             PropertyInfo prop = entityType.GetProperty(propName);
             ThrowIfPropIsNull(entityType, prop, propName);
 
-            Expression exp = makeWrapperAccess ? Utils.MakeWrapperAccess(bindValue, prop.PropertyType) : Expression.Constant(bindValue, prop.PropertyType);
+            Expression exp = makeWrapperAccess ? Chloe.Extensions.ExpressionExtension.MakeWrapperAccess(bindValue, prop.PropertyType) : Expression.Constant(bindValue, prop.PropertyType);
 
             MemberAssignment bind = Expression.Bind(prop, exp);
 

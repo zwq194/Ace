@@ -15,46 +15,5 @@ namespace Ace
             if (obj == null)
                 throw new ArgumentNullException(paramName);
         }
-
-        public static Expression MakeWrapperAccess(object value, Type targetType)
-        {
-            object wrapper;
-            Type wrapperType;
-
-            if (value == null)
-            {
-                if (targetType != null)
-                    return Expression.Constant(value, targetType);
-                else
-                    return Expression.Constant(value, typeof(object));
-            }
-            else
-            {
-                Type valueType = value.GetType();
-                wrapperType = typeof(ConstantWrapper<>).MakeGenericType(valueType);
-                ConstructorInfo constructor = wrapperType.GetConstructor(new Type[] { valueType });
-                wrapper = constructor.Invoke(new object[] { value });
-            }
-
-            ConstantExpression wrapperConstantExp = Expression.Constant(wrapper);
-            Expression ret = Expression.MakeMemberAccess(wrapperConstantExp, wrapperType.GetProperty("Value"));
-
-            if (ret.Type != targetType)
-            {
-                ret = Expression.Convert(ret, targetType);
-            }
-
-            return ret;
-        }
     }
-
-    internal class ConstantWrapper<T>
-    {
-        public ConstantWrapper(T value)
-        {
-            this.Value = value;
-        }
-        public T Value { get; private set; }
-    }
-
 }
