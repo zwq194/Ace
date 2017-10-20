@@ -66,9 +66,9 @@
     <Compile Include="AdminAppService.cs" />
     <Compile Include="AdminSession.cs" />
     <Compile Include="AppServiceBase.cs" />
-    <Compile Include="AppServiceFactory.cs" />
     <Compile Include="Common\AppConsts.cs" />
     <Compile Include="Common\UserHelper.cs" />
+    <Compile Include="CurrentAssembly.cs" />
     <Compile Include="Implements\AccountAppService.cs" />
     <Compile Include="Implements\System\DepartmentAppService.cs" />
     <Compile Include="Implements\System\DutyAppService.cs" />

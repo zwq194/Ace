@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ace.Application\Ace.Application.csproj" />
+    <ProjectReference Include="..\Ace.AutoMapper\Ace.AutoMapper.csproj" />
+    <ProjectReference Include="..\Ace.Data\Ace.Data.csproj" />
+    <ProjectReference Include="..\Ace.Entity.Wiki\Ace.Entity.Wiki.csproj" />
+    <ProjectReference Include="..\Ace.Entity\Ace.Entity.csproj" />
+    <ProjectReference Include="..\Ace\Ace.csproj" />
+  </ItemGroup>
+
+</Project>

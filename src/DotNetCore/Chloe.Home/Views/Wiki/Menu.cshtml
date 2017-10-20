@@ -1,0 +1,120 @@
+﻿@using Chloe.Home.Models;
+
+<div id="mw-panel">
+    @foreach (WikiMenuTreeNode rootNode in this.Model.RootNodes)
+    {
+        string currentNodeId = this.Model.CurrentNodeId;
+        bool expanded = rootNode.ChildNodes.Any(c => c.Id == currentNodeId);
+
+        string activeClass = expanded ? "portal active" : "portal";
+        string display = expanded ? "block" : "none";
+        <div class="@activeClass" id='@rootNode.Id'>
+            <h5><span class="portal_arrow"></span>@rootNode.Name</h5>
+            <div class="body" style="display:@display">
+                <ul>
+                    @foreach (WikiMenuTreeNode childNode in rootNode.ChildNodes)
+                    {
+                        if (childNode.Id == currentNodeId)
+                        {
+                            <li id="@childNode.Id"><a href="@childNode.Url" style="color:#01AAED;">&nbsp;&nbsp;&nbsp;@childNode.Name</a></li>
+                        }
+                        else
+                        {
+                            <li id="@childNode.Id"><a href="@childNode.Url">&nbsp;&nbsp;&nbsp;@childNode.Name</a></li>
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+</div>
+@*<div id="mw-panel">
+        <div class="portal" id=''>
+            <h5><span class="portal_arrow"></span>接口一览</h5>
+            <div class="body">
+                <ul>
+                    <li id=""><a href="#">IDbContext</a></li>
+                    <li id=""><a href="#">IDbSession</a></li>
+                    <li id=""><a href="#">IQuery</a></li>
+                    <li id=""><a href="#">IOrderedQuery</a></li>
+                    <li id=""><a href="#">IGroupingQuery</a></li>
+                    <li id=""><a href="#">IJoiningQuery</a></li>
+                    <li id=""><a href="#">AggregateFunctions</a></li>
+                    <li id=""><a href="#">DbFunctions</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="portal" id=''>
+            <h5><span class="portal_arrow"></span>实体定义</h5>
+            <div class="body">
+                <ul>
+                    <li id=""><a href="#">实体</a></li>
+                    <li id=""><a href="#">实体特性</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="portal" id=''>
+            <h5><span class="portal_arrow"></span>SqlServer</h5>
+            <div class="body">
+                <ul>
+                    <li id=""><a href="#">查询</a></li>
+                    <li id=""><a href="#">插入</a></li>
+                    <li id=""><a href="#">更新</a></li>
+                    <li id=""><a href="#">删除</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="portal" id=''>
+            <h5><span class="portal_arrow"></span>MySql</h5>
+            <div class="body">
+                <ul>
+                    <li id=""><a href="#">查询</a></li>
+                    <li id=""><a href="#">插入</a></li>
+                    <li id=""><a href="#">更新</a></li>
+                    <li id=""><a href="#">删除</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="portal" id=''>
+            <h5><span class="portal_arrow"></span>Sqlite</h5>
+            <div class="body">
+                <ul>
+                    <li id=""><a href="#">查询</a></li>
+                    <li id=""><a href="#">插入</a></li>
+                    <li id=""><a href="#">更新</a></li>
+                    <li id=""><a href="#">删除</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="portal" id=''>
+            <h5><span class="portal_arrow"></span>Oracle</h5>
+            <div class="body">
+                <ul>
+                    <li id=""><a href="#">查询</a></li>
+                    <li id=""><a href="#">插入</a></li>
+                    <li id=""><a href="#">更新</a></li>
+                    <li id=""><a href="#">删除</a></li>
+                    <li id=""><a href="#">使用进阶</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="portal" id=''>
+            <h5><span class="portal_arrow"></span>使用进阶</h5>
+            <div class="body">
+                <ul>
+                    <li id=""><a href="#">事务</a></li>
+                    <li id=""><a href="#">返回多维数据</a></li>
+                    <li id=""><a href="#">复杂查询</a></li>
+                    <li id=""><a href="#">lambda支持</a></li>
+                    <li id=""><a href="#">函数支持</a></li>
+                </ul>
+            </div>
+        </div>
+
+    </div>*@

@@ -49,6 +49,7 @@
     <Compile Include="AceCheck.cs" />
     <Compile Include="AceUtils.cs" />
     <Compile Include="Application\AppServiceExtension.cs" />
+    <Compile Include="Application\AppServiceFactory.cs" />
     <Compile Include="Application\EmpyDisposeAppService.cs" />
     <Compile Include="Application\IAceSessionAppService.cs" />
     <Compile Include="Application\IAppService.cs" />
