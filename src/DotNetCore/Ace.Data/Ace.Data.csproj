@@ -6,10 +6,10 @@
 
   <ItemGroup>
     <PackageReference Include="ChloeCore.Extension" Version="1.8.0" />
-    <PackageReference Include="ChloeCore.MySql" Version="2.21.0" />
-    <PackageReference Include="ChloeCore.Oracle" Version="2.21.0" />
-    <PackageReference Include="ChloeCore.SQLite" Version="2.21.0" />
-    <PackageReference Include="ChloeCore.SqlServer" Version="2.21.0" />
+    <PackageReference Include="ChloeCore.MySql" Version="2.21.1" />
+    <PackageReference Include="ChloeCore.Oracle" Version="2.21.1" />
+    <PackageReference Include="ChloeCore.SQLite" Version="2.21.1" />
+    <PackageReference Include="ChloeCore.SqlServer" Version="2.21.1" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="1.1.1" />
     <!--<PackageReference Include="MySql.Data" Version="7.0.7-m61" />-->
     <PackageReference Include="MySqlConnector" Version="0.26.5" />
