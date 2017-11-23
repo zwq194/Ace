@@ -13,8 +13,8 @@ namespace Microsoft.AspNetCore.Hosting
         public static IWebHostBuilder BindUrls(this IWebHostBuilder hostBuilder, string[] appLaunchArgs, string contentRoot)
         {
             /*
-             * 1.从启动参数中传入要监听的 urls，格式如：dotnet run -urls http://localhost:5001;http://localhost:5002
-             * 2.如果启动参数中未包含 urls 参数，则从 config/hosting.json 配置中查找要监听的 urls
+             * 1.从启动参数中传入要监听的 useurls，格式如：dotnet run -useurls http://localhost:5001;http://localhost:5002
+             * 2.如果启动参数中未包含 useurls 参数，则从 config/hosting.json 配置中查找要监听的 useurls
              * ！如果通过上述两个方式都找不到 urls，则使用默认方式！
              */
 
@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.Hosting
 
             string[] urls = new string[0];
             List<string> inputArgs = appLaunchArgs == null ? new List<string>() : appLaunchArgs.ToList();
-            int indexOf_urls = inputArgs.IndexOf("-urls");
+            int indexOf_urls = inputArgs.IndexOf("-useurls");
             if (indexOf_urls != -1 && inputArgs.Count > indexOf_urls + 1)
             {
                 urls = inputArgs[indexOf_urls + 1].Split(';');
