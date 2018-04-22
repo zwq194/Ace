@@ -38,5 +38,29 @@ namespace Ace.Reflection
             return ret;
         }
 
+        /* .net */
+        //public static List<Assembly> LoadCompileAssemblies()
+        //{
+        //    Assembly currentAssembly = Assembly.GetExecutingAssembly();
+
+        //    string currentAssemblyDir = Path.GetDirectoryName(currentAssembly.CodeBase.Replace("file:///", ""));
+
+        //    var dllNames = Directory.GetFiles(currentAssemblyDir).Where(a => a.ToLower().EndsWith(".dll")).ToList();
+
+        //    List<Assembly> assemblies = new List<Assembly>();
+        //    foreach (var dllName in dllNames)
+        //    {
+        //        Assembly assembly = Assembly.LoadFrom(dllName);
+
+        //        string lowerName = assembly.GetName().Name.ToLower();
+        //        if (lowerName.StartsWith("system") || lowerName.StartsWith("microsoft"))
+        //            continue;
+
+        //        assemblies.Add(assembly);
+        //    }
+
+        //    return assemblies;
+        //}
+
     }
 }

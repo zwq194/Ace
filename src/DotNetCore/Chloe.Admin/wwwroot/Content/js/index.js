@@ -156,20 +156,32 @@ function GetLoadNav() {
     $.each(data, function (i) {
         var row = data[i];
         if (row.ParentId == null) {
-            _html += '<li>';
-            _html += '<a data-id="' + row.Id + '" href="#" class="dropdown-toggle"><i class="' + row.Icon + '"></i><span>' + row.Name + '</span><i class="fa fa-angle-right drop-icon"></i></a>';
-            var childNodes = row.ChildNodes;
-            if (childNodes.length > 0) {
-                _html += '<ul class="submenu">';
-                $.each(childNodes, function (i) {
-                    var subrow = childNodes[i];
-                    _html += '<li>';
-                    _html += '<a class="menuItem" data-id="' + subrow.Id + '" href="' + subrow.UrlAddress + '" data-index="' + subrow.SortCode + '">' + subrow.Name + '</a>';
-                    _html += '</li>';
-                });
-                _html += '</ul>';
+            if (row.Type == 4) {//½Úµã×é
+                _html += '<li>';
+                _html += '<a data-id="' + row.Id + '" href="#" class="dropdown-toggle"><i class="' + row.Icon + '"></i><span>' + row.Name + '</span><i class="fa fa-angle-right drop-icon"></i></a>';
+                var childNodes = row.Children;
+                if (childNodes.length > 0) {
+                    _html += '<ul class="submenu">';
+                    $.each(childNodes, function (i) {
+                        var subrow = childNodes[i];
+                        _html += '<li>';
+                        _html += '<a class="menuItem" data-id="' + subrow.Id + '" href="' + subrow.Url + '" data-index="' + subrow.SortCode + '">' + subrow.Name + '</a>';
+                        _html += '</li>';
+                    });
+                    _html += '</ul>';
+                }
+                _html += '</li>';
             }
-            _html += '</li>';
+            else {
+                _html += '<li class="common">';
+                _html += '<a class="menuItem" data-id="' + row.Id + '" href="' + row.Url + '" data-index="' + row.SortCode + '">';
+
+                _html += '<i class="' + row.Icon + '"></i>';
+                _html += '<span>' + row.Name + '</span>';
+                _html += '</a>';
+
+                _html += '</li>';
+            }
         }
     });
 

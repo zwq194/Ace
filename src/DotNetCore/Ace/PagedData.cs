@@ -12,16 +12,16 @@ namespace Ace
             : base()
         {
         }
-        public PagedData(List<object> dataList)
-            : base(dataList, 0)
+        public PagedData(List<object> models)
+            : base(models, 0)
         {
         }
-        public PagedData(List<object> dataList, int totalCount)
-            : base(dataList, totalCount, 0, 0)
+        public PagedData(List<object> models, int totalCount)
+            : base(models, totalCount, 0, 0)
         {
         }
-        public PagedData(List<object> dataList, int totalCount, int currentPage, int pageSize)
-            : base(dataList, totalCount, currentPage, pageSize)
+        public PagedData(List<object> models, int totalCount, int currentPage, int pageSize)
+            : base(models, totalCount, currentPage, pageSize)
         {
         }
 
@@ -45,17 +45,17 @@ namespace Ace
             : this(new List<T>())
         {
         }
-        public PagedData(List<T> dataList)
-            : this(dataList, 0)
+        public PagedData(List<T> models)
+            : this(models, 0)
         {
         }
-        public PagedData(List<T> dataList, int totalCount)
-            : this(dataList, totalCount, 0, 0)
+        public PagedData(List<T> models, int totalCount)
+            : this(models, totalCount, 0, 0)
         {
         }
-        public PagedData(List<T> dataList, int totalCount, int currentPage, int pageSize)
+        public PagedData(List<T> models, int totalCount, int currentPage, int pageSize)
         {
-            this.DataList = dataList;
+            this.Models = models;
             this.TotalCount = totalCount;
             this.CurrentPage = currentPage;
             this.PageSize = pageSize;
@@ -91,6 +91,6 @@ namespace Ace
         }
         public int CurrentPage { get; set; }
         public int PageSize { get; set; }
-        public List<T> DataList { get; set; }
+        public List<T> Models { get; set; }
     }
 }

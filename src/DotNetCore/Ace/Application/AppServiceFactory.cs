@@ -25,7 +25,7 @@ namespace Ace.Application
 
         public IAceSession Session { get; set; }
 
-        public virtual T CreateService<T>() where T : IAppService
+        public virtual T CreateService<T>()
         {
             object serviceObj = this._serviceProvider.GetService(typeof(T));
             if (serviceObj == null)

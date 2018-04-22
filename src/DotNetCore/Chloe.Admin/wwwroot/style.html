@@ -1,0 +1,154 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="Content/My97DatePicker/WdatePicker.js"></script>
+    <link href="Content/css/style.css" rel="stylesheet" />
+    <link href="/Content/font-awesome/font-awesome.min.css" rel="stylesheet" />
+    <link href="Content/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <script src="Content/jquery/jquery-1.11.1.js"></script>
+    <link href="Content/select2/select2.min.css" rel="stylesheet" />
+    <script src="Content/select2/select2.min.js"></script>
+    <script src="style.js"></script>
+    <style>
+    </style>
+</head>
+<body style="padding:30px;">
+    <input type="button" id="btn" value="测试" />
+    <script>
+    </script>
+
+    <div style="margin:10px;">
+        <b>select2：</b>
+        <br />
+        单选：
+        <select class="js-example-basic-single" name="state">
+            <option value="1">A北京</option>
+            <option value="2">B上海</option>
+            <option value="3">C广州</option>
+        </select>
+        多选：
+        <select class="js-example-basic-multiple" name="states" multiple="multiple">
+            <option value="AL">Alabama</option>
+            <option value="WY" selected="selected">Wyoming</option>
+            <optgroup label="Group Name">
+                <option value="HH">Nested option</option>
+                <option value="MM" selected="selected">MM</option>
+            </optgroup>
+        </select>
+        <select class="js-example-basic-multiple2" name="states" multiple="multiple"></select>
+        模版：
+        <select class="js-example-templating" name="states" multiple="multiple">
+            <option value="AL">Alabama</option>
+            <option value="WY">Wyoming</option>
+        </select>
+    </div>
+
+    <div style="margin:10px;">
+        <b>单选框：</b>
+        <input id="IsEnabled1" class="a-radio" name="Type" checked type="radio" value="true" data-bind="typedChecked:model().IsEnabled,dataType:'bool'"><label for="IsEnabled1">是</label>
+        <input id="IsEnabled0" class="a-radio" name="Type" type="radio" value="false" data-bind="typedChecked:model().IsEnabled,dataType:'bool'"><label for="IsEnabled0">否</label>
+    </div>
+    <div style="margin:10px;">
+        <b>多选框：</b>
+        <input id="IsMenu" class="a-checkbox" name="IsMenu" type="checkbox" data-bind="checked:model().IsMenu"><label for="IsMenu">菜单</label>
+        <input id="IsPublic" class="a-checkbox" name="IsPublic" type="checkbox" data-bind="checked:model().IsPublic"><label for="IsPublic">公共</label>
+
+        <input id="IsExpand" class="a-checkbox" name="IsExpand" type="checkbox" data-bind="checked:model().IsExpand"><label for="IsExpand">展开</label>
+        <input id="IsEnabled" class="a-checkbox" name="IsEnabled" type="checkbox" data-bind="checked:model().IsEnabled"><label for="IsEnabled">有效</label>
+    </div>
+
+
+    <div style="margin:10px;">
+        <b>按钮：</b>
+        <button type="button" class="a-btn" data-bind="click:save">默认</button>
+        <button type="button" class="a-btn-primary" data-bind="click:save">首选项</button>
+        <button type="button" class="a-btn-success" data-bind="click:save">成功</button>
+        <button type="button" class="a-btn-info" data-bind="click:save">一般信息</button>
+        <button type="button" class="a-btn-warning" data-bind="click:save">警告</button>
+        <button type="button" class="a-btn-danger" data-bind="click:save">危险</button>
+        <input type="button" class="a-btn" value="保存" />
+        <a href="#" class="a-btn" disabled>保存</a>
+        <button type="button" class="a-btn" data-bind="click:save" disabled>禁用</button>
+    </div>
+
+    <div style="margin:10px;">
+        <b>显目显示：</b>
+        <span class="a-span-primary" disabled data-bind="click:save">是</span>
+        <span class="a-span-success" data-bind="click:save">成功</span>
+        <span class="a-span-info" data-bind="click:save">一般信息</span>
+        <span class="a-span-warning" data-bind="click:save">警告</span>
+        <span class="a-span-danger" data-bind="click:save">危险</span>
+        <span class="a-span-primary-s" data-bind="click:save">是</span>
+        <span class="a-span-success-s" data-bind="click:save">成功</span>
+        <span class="a-span-info-s" data-bind="click:save">一般信息</span>
+        <span class="a-span-warning-s" data-bind="click:save">警告</span>
+        <span class="a-span-danger-s" data-bind="click:save">危险</span>
+    </div>
+
+    <div style="margin:10px;">
+        <div style="padding-top: 20px; margin-right: 30px;">
+            <form id="form1">
+                <b>表单：</b>
+                <table class="form-table" style="width:500px">
+                    <tr>
+                        <td class="form-title" style="">名称</td>
+                        <td class="form-value">
+                            <input id="Name" name="Name" type="text" class="a-control required" placeholder="请输入名称" data-bind="value:model().Name" />$$$$
+                        </td>
+                        <td class="form-title">日期</td>
+                        <td class="form-value">
+                            <input id="EnCode" name="EnCode" type="text" class="a-control required Wdate" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" placeholder="" data-bind="value:model().EnCode" /> <button type="button" class="a-btn-warning" data-bind="click:Save">保存</button>
+                        </td>
+                    </tr>
+                    <tr>
+                    <tr>
+                        <td class="form-title">部门负责人人</td>
+                        <td class="form-value">
+                            <input id="Manager" name="Manager" type="text" class="a-control" data-bind="value:model().Manager" />
+                        </td>
+                        <td class="form-title">呵呵</td>
+                        <td class="form-value">
+                            <input id="MobilePhone" name="MobilePhone" type="text" class="a-control" data-bind="value:model().MobilePhone" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-title">性别</td>
+                        <td class="form-value">
+                            <select class="a-control">
+                                <option>男</option>
+                                <option>女</option>
+                            </select>
+                        </td>
+                        <td class="form-title">手机</td>
+                        <td class="form-value">
+                            <input id="MobilePhone" name="MobilePhone" type="text" class="a-control" data-bind="value:model().MobilePhone" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-title">微信</td>
+                        <td class="form-value">
+                            <input id="WeChat" name="WeChat" type="text" class="a-control" data-bind="value:model().WeChat" />
+                        </td>
+                        <td class="form-title">邮箱</td>
+                        <td class="form-value">
+                            <input id="Email" name="Email" type="text" class="a-control" data-bind="value:model().Email" />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="form-title" style="padding-top: 5px; vertical-align:top;">
+                            备注
+                        </td>
+                        <td class="form-value" colspan="3">
+                            <textarea id="Description" name="Description" class="a-control" style="" data-bind="value:model().Description"></textarea>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -21,6 +21,7 @@ using Ace.Web.Mvc;
 using NLog.Extensions.Logging;
 using NLog.Web;
 using Microsoft.Extensions.Caching.Memory;
+using Chloe.Admin.Common;
 
 namespace Chloe.Admin
 {
@@ -64,11 +65,14 @@ namespace Chloe.Admin
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            }).AddCookie();
+            }).AddCookie(options =>
+            {
+            });
 
             services.AddMvc(options =>
             {
                 options.Filters.Add(typeof(HttpGlobalExceptionFilter));
+                options.Filters.Add(typeof(WebPermissionFilter));
             }).AddControllersAsServices();
         }
 
@@ -80,7 +84,7 @@ namespace Chloe.Admin
             loggerFactory.AddNLog();
             app.AddNLogWeb();
 
-            Globals.ServiceProvider = app.ApplicationServices;
+            Globals.Services = app.ApplicationServices;
             AceMapper.InitializeMap(); /* 初始化 AutoMapper */
 
             if (env.IsDevelopment())

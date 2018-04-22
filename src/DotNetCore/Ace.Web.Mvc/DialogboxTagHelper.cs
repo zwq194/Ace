@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Ace.Web.Mvc
 {
     [HtmlTargetElement("dialogbox")]
-    public class DialogboxTagHelper : TagHelper
+    public class DialogboxTag1Helper : TagHelper
     {
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
@@ -18,18 +18,18 @@ namespace Ace.Web.Mvc
             output.TagName = "div";
 
             output.PreContent.AppendLine();
-            output.PreContent.AppendText("    <div data-bind=\"display:IsShow()\" class=\"modal fade\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\" data-backdrop=\"false\" data-keyboard=\"true\">");
+            output.PreContent.AppendText("    <div data-bind=\"display:isShow()\" class=\"modal fade\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\" data-backdrop=\"false\" data-keyboard=\"true\">");
             output.PreContent.AppendLine();
 
             output.PreContent.AppendText("        <div class=\"modal-dialog\" style=\"{0}\">", style ?? "");
             output.PreContent.AppendLine();
             output.PreContent.AppendText("            <div class=\"modal-content\" style=\"{0}\">", style ?? "");
             output.PreContent.AppendLine();
-            output.PreContent.AppendText("                <div class=\"modal-header\">");
+            output.PreContent.AppendText("                <div class=\"modal-header\" style=\"padding-bottom:4px;\">");
             output.PreContent.AppendLine();
-            output.PreContent.AppendText("                    <label data-bind=\"text:Title\"></label>");
+            output.PreContent.AppendText("                    <label data-bind=\"text:title\"></label>");
             output.PreContent.AppendLine();
-            output.PreContent.AppendText("                    <button type=\"button\" class=\"close\" data-dismiss=\"modal\" data-bind=\"click:function(){ IsShow(false);}\"><span aria-hidden=\"true\">&times;</span></button>");
+            output.PreContent.AppendText("                    <button type=\"button\" class=\"close\" data-dismiss=\"modal\"><span aria-hidden=\"true\">&times;</span></button>");
             output.PreContent.AppendLine();
             output.PreContent.AppendText("                </div>");
             output.PreContent.AppendLine();
@@ -45,11 +45,11 @@ namespace Ace.Web.Mvc
             bool noFooter = output.Attributes.Where(a => a.Name == "no-footer").FirstOrDefault() != null;
             if (!noFooter)
             {
-                output.PostContent.AppendText("               <div class=\"modal-footer\">");
+                output.PostContent.AppendText("               <div class=\"modal-footer\" style=\"padding-top:10px;padding-bottom:10px;\">");
                 output.PostContent.AppendLine();
-                output.PostContent.AppendText("                    <button type=\"button\" class=\"btn btn-default\" data-bind=\"click:Save\">保存</button>");
+                output.PostContent.AppendText("                    <button type=\"button\" class=\"a-btn-primary\" data-bind=\"click:save\">保存</button>");
                 output.PostContent.AppendLine();
-                output.PostContent.AppendText("                    <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\" data-bind=\"click:function(){ IsShow(false);}\">关闭</button>");
+                output.PostContent.AppendText("                    <button type=\"button\" class=\"a-btn\" data-dismiss=\"modal\" data-bind=\"click:function(){ isShow(false);}\">关闭</button>");
                 output.PostContent.AppendLine();
                 output.PostContent.AppendText("               </div>");
                 output.PostContent.AppendLine();

@@ -11,13 +11,12 @@ namespace Ace.Application
 {
     public class AdminSession : AceSession<string>
     {
-        public string UserName { get; set; }
-        public string RealName { get; set; }
-        public string DepartmentId { get; set; }
-        public string DutyId { get; set; }
-        public string RoleId { get; set; }
+        public string AccountName { get; set; }
+        public string Name { get; set; }
+        // public string OrgIds { get; set; }
+        //public string RoleIds { get; set; }
         public string LoginIP { get; set; }
-        public DateTime LoginTime { get; set; }
+        //public DateTime LoginTime { get; set; }
         public bool IsAdmin { get; set; }
 
 
@@ -26,13 +25,11 @@ namespace Ace.Application
             List<Claim> claims = new List<Claim>();
 
             claims.Add(new Claim("UserId", this.UserId ?? ""));
-            claims.Add(new Claim("UserName", this.UserName ?? ""));
-            claims.Add(new Claim("RealName", this.RealName ?? ""));
-            claims.Add(new Claim("DepartmentId", this.DepartmentId ?? ""));
-            claims.Add(new Claim("DutyId", this.DutyId ?? ""));
-            claims.Add(new Claim("RoleId", this.RoleId ?? ""));
+            claims.Add(new Claim("AccountName", this.AccountName ?? ""));
+            claims.Add(new Claim("Name", this.Name ?? ""));
+            //claims.Add(new Claim("OrgIds", this.OrgIds ?? ""));
+            //claims.Add(new Claim("RoleIds", this.RoleIds ?? ""));
             claims.Add(new Claim("LoginIP", this.LoginIP ?? ""));
-            claims.Add(new Claim("LoginTime", this.LoginTime.TotalMilliseconds().ToString()));
             claims.Add(new Claim("IsAdmin", this.IsAdmin.ToString()));
 
             return claims;
@@ -45,13 +42,13 @@ namespace Ace.Application
                 AdminSession session = new AdminSession()
                 {
                     UserId = claims.Claims.FirstOrDefault(x => x.Type == "UserId")?.Value ?? "",
-                    UserName = claims.Claims.FirstOrDefault(x => x.Type == "UserName")?.Value ?? "",
-                    RealName = claims.Claims.FirstOrDefault(x => x.Type == "RealName")?.Value ?? "",
-                    DepartmentId = claims.Claims.FirstOrDefault(x => x.Type == "DepartmentId")?.Value ?? "",
-                    DutyId = claims.Claims.FirstOrDefault(x => x.Type == "DutyId")?.Value ?? "",
-                    RoleId = claims.Claims.FirstOrDefault(x => x.Type == "RoleId")?.Value ?? "",
-                    LoginIP = claims.Claims.FirstOrDefault(x => x.Type == "LoginIP")?.Value ?? "",
-                    LoginTime = DateTimeHelper.Parse(long.Parse(claims.Claims.FirstOrDefault(x => x.Type == "LoginTime")?.Value ?? "0")),
+                    AccountName = claims.Claims.FirstOrDefault(x => x.Type == "AccountName")?.Value ?? "",
+                    Name = claims.Claims.FirstOrDefault(x => x.Type == "Name")?.Value ?? "",
+                    //DepartmentId = claims.Claims.FirstOrDefault(x => x.Type == "DepartmentId")?.Value ?? "",
+                    //DutyId = claims.Claims.FirstOrDefault(x => x.Type == "DutyId")?.Value ?? "",
+                    //RoleId = claims.Claims.FirstOrDefault(x => x.Type == "RoleId")?.Value ?? "",
+                    //LoginIP = claims.Claims.FirstOrDefault(x => x.Type == "LoginIP")?.Value ?? "",
+                    //LoginTime = DateTimeHelper.Parse(long.Parse(claims.Claims.FirstOrDefault(x => x.Type == "LoginTime")?.Value ?? "0")),
                     IsAdmin = bool.Parse(claims.Claims.FirstOrDefault(x => x.Type == "IsAdmin")?.Value ?? "false")
                 };
                 return session;

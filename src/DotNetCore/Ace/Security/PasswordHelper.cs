@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ace.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -40,7 +41,7 @@ namespace Ace.Security
         public static void EnsurePasswordLegal(string pwdText)
         {
             if (pwdText == null || pwdText.Length < 6 || pwdText.Length > 15)
-                throw new Ace.Exceptions.InvalidDataException("密码必须是6-15位");
+                throw new InvalidInputException("密码必须是6-15位");
         }
     }
 }

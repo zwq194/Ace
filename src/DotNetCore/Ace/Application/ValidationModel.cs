@@ -18,7 +18,7 @@ namespace Ace.Application
                     (this, vc, validationResults, true);
             if (isValid == false)
             {
-                throw new Ace.Exceptions.InvalidDataException(validationResults[0].ErrorMessage);
+                throw new InvalidInputException(validationResults[0].ErrorMessage);
             }
         }
     }

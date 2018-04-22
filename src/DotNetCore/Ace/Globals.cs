@@ -8,7 +8,7 @@ namespace Ace
 {
     public static class Globals
     {
-        public static IServiceProvider ServiceProvider { get; set; }
+        public static IServiceProvider Services { get; set; }
         public static IConfigurationRoot Configuration { get; set; }
     }
 }

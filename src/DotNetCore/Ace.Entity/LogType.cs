@@ -23,9 +23,7 @@ namespace Ace.Entity
         Delete = 5,
         //[Description("修改")]
         Update = 6,
-        //[Description("提交")]
-        Submit = 7,
         //[Description("异常")]
-        Exception = 8,
+        Exception = 7,
     }
 }

@@ -52,11 +52,11 @@
             }
         }
         me.OnSave = function () {
-            var model = me.Model();
-
             if (!$('#form1').formValid()) {
                 return false;
             }
+
+            var model = me.Model();
 
             if (me.EditModel()) {
                 $ace.post("@this.Href("~/SystemManage/xx/Update")", model, function (result) {

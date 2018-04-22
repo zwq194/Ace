@@ -61,5 +61,9 @@ namespace System.Linq
 
             return dic.Values;
         }
+        public static bool In<T>(this T obj, IEnumerable<T> source)
+        {
+            return source.Contains(obj);
+        }
     }
 }

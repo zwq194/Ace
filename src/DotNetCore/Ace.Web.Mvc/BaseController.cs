@@ -93,40 +93,48 @@ namespace Ace.Web.Mvc
         }
 
 
+        [NonAction]
         public ContentResult JsonContent(object obj)
         {
             string json = JsonHelper.Serialize(obj);
             return base.Content(json);
         }
 
+        [NonAction]
         public ContentResult SuccessData(object data = null)
         {
             Result<object> result = Result.CreateResult<object>(ResultStatus.OK, data);
             return this.JsonContent(result);
         }
-        public ContentResult SuccessMsg(string msg = null)
+        [NonAction]
+        public ContentResult SuccessMsg(string msg = "操作成功")
         {
             Result result = new Result(ResultStatus.OK, msg);
             return this.JsonContent(result);
         }
+        [NonAction]
         public ContentResult AddSuccessData(object data, string msg = "添加成功")
         {
             Result<object> result = Result.CreateResult<object>(ResultStatus.OK, data);
             result.Msg = msg;
             return this.JsonContent(result);
         }
+        [NonAction]
         public ContentResult AddSuccessMsg(string msg = "添加成功")
         {
             return this.SuccessMsg(msg);
         }
+        [NonAction]
         public ContentResult UpdateSuccessMsg(string msg = "更新成功")
         {
             return this.SuccessMsg(msg);
         }
+        [NonAction]
         public ContentResult DeleteSuccessMsg(string msg = "删除成功")
         {
             return this.SuccessMsg(msg);
         }
+        [NonAction]
         public ContentResult FailedMsg(string msg = null)
         {
             Result retResult = new Result(ResultStatus.Failed, msg);

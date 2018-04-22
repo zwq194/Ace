@@ -9,7 +9,6 @@ namespace Ace.Entity.System
     public class Sys_Role
     {
         public string Id { get; set; }
-        public string EnCode { get; set; }
         public string Name { get; set; }
         public int? SortCode { get; set; }
 

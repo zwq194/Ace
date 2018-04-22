@@ -40,7 +40,7 @@ $.request = function (name) {
     return "";
 }
 $.currentWindow = function () {
-    var iframeId = top.$(".NFine_iframe:visible").attr("id");
+    var iframeId = top.$(".Ace_iframe:visible").attr("id");
     return top.frames[iframeId];
 }
 $.browser = function () {
@@ -286,7 +286,7 @@ $.fn.jqGridRowValue = function () {
 }
 $.fn.authorizeButton = function () {
     return;
-    var moduleId = top.$(".NFine_iframe:visible").attr("id").substr(6);
+    var moduleId = top.$(".Ace_iframe:visible").attr("id").substr(6);
     var dataJson = top.clients.authorizeButton[moduleId];
     var $element = $(this);
     $element.find('a[authorize=yes]').attr('authorize', 'no');

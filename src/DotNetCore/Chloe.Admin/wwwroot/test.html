@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <!--<script type="text/javascript" src="jquery/jquery-1.11.1.min.js"></script>-->
+    <!--<link rel="stylesheet" href="jquery-ui/jquery-ui.min.css">
+    <script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
+
+    <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+    <script type="text/javascript" src="bootstrap/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="css/framework-font.css">
+    <link rel="stylesheet" href="css/framework-ui.css">
+
+    <script type="text/javascript" src="knockout/knockout-latest.js"></script>
+    <script type="text/javascript" src="knockout/knockout.mapping-latest.js"></script>
+    <script type="text/javascript" src="js/kohelper.js"></script>
+
+    <script type="text/javascript" src="validate/jquery.validate.min.js"></script>-->
+    <!--<script type="text/javascript" src="My97DatePicker/WdatePicker.js"></script>-->
+    <!--<link rel="stylesheet" href="dialog/dialog.css">
+    <script type="text/javascript" src="dialog/dialog.js"></script>
+    <script type="text/javascript" src="js/ace.js"></script>-->
+
+    <script src="/Content/jquery/jquery-2.1.1.min.js"></script>
+
+    <link rel="stylesheet" href="/Content/bootstrap/bootstrap.min.css">
+    <script type="text/javascript" src="/Content/bootstrap/bootstrap.min.js"></script>
+
+
+    <!--<script src="laydate/laydate.js"></script>-->
+    <!--<script src="datepicker/WdatePicker.js"></script>-->
+    <!--<script src="My97DatePicker/WdatePicker.js"></script>-->
+</head>
+<body>
+
+    <style>
+        .d {
+            transform: rotate(10deg);
+            -ms-transform: rotate(10deg); /* IE 9 */
+            -moz-transform: rotate(10deg); /* Firefox */
+            -webkit-transform: rotate(-31deg); /* Safari 和 Chrome */
+            -o-transform: rotate(10deg); /* Opera */
+            position: absolute;
+            width: 16px;
+            height: 10px;
+            border: 1px solid #808080;
+            /*border-color: #808080;*/
+            background-color: #ffffff;
+            /*border-radius: 3px;*/
+            border-bottom-left-radius: 3px;
+            top: 64.5px;
+            left: 60px;
+            border-top: none;
+            border-right: none;
+            z-index: 0;
+        }
+
+        .dd {
+            position: absolute;
+            width: 60px;
+            height: 20px;
+            border: 1px solid #808080;
+            border-radius: 1px;
+            margin: 50px;
+            border-radius: 5px;
+            z-index: 999;
+        }
+    </style>
+
+
+    <div class="dd" style="">aaaaaaaa</div>
+
+    <div class="d" style=""></div>
+
+    <hr style="display:block; position: absolute;left:60px; top:47px;width:12px;height:0px;border:solid 1.5px #ffffff;border-radius:20%; background-color:#ffffff; z-index:9999" />
+
+    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Tooltip on left">Tooltip on left</button>
+
+    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Tooltip on top">Tooltip on top</button>
+
+    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom">Tooltip on bottom</button>
+
+    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="right" title="Tooltip on right">Tooltip on right</button>
+
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
+</body>
+</html>

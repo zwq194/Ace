@@ -7,6 +7,7 @@ using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
+using Ace.Exceptions;
 
 namespace Ace.Web.Mvc
 {
@@ -38,7 +39,7 @@ namespace Ace.Web.Mvc
             {
                 string msg = null;
 
-                if (ex is Ace.Exceptions.InvalidDataException)
+                if (ex is InvalidInputException)
                 {
                     msg = ex.Message;
                     filterContext.Result = this.FailedMsg(msg);
@@ -55,7 +56,7 @@ namespace Ace.Web.Mvc
             {
                 string msg = null;
 
-                if (ex is Ace.Exceptions.InvalidDataException)
+                if (ex is InvalidInputException)
                 {
                     msg = ex.Message;
                 }

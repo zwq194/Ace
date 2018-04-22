@@ -18,6 +18,21 @@ using Microsoft.AspNetCore.Authentication;
 
 namespace Chloe.Admin.Common
 {
+    public abstract class WebController<TService> : WebController
+    {
+        TService _service;
+        protected TService Service
+        {
+            get
+            {
+                if (this._service == null)
+                    this._service = this.CreateService<TService>();
+
+                return this._service;
+            }
+        }
+    }
+
     public abstract class WebController : BaseController
     {
         [Disposable]
@@ -32,7 +47,7 @@ namespace Chloe.Admin.Common
             }
         }
 
-
+        [NonAction]
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             ObsoleteApiAttribute obsoleteAttr = filterContext.ActionDescriptor.FilterDescriptors.Where(a => a.Filter is ObsoleteApiAttribute).Select(a => a.Filter).FirstOrDefault() as ObsoleteApiAttribute;
@@ -104,7 +119,7 @@ namespace Chloe.Admin.Common
             }
         }
 
-        protected T CreateService<T>() where T : IAppService
+        protected T CreateService<T>()
         {
             return this.AppServicesFactory.CreateService<T>();
         }

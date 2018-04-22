@@ -22,7 +22,7 @@ namespace Chloe.Home.Controllers
         {
             string docId = id;
 
-            WikiDocumentDetailModel model = this.CreateService<IWikiDocumentAppService>().GetDetailModel(docId);
+            WikiDocumentDetailModel model = this.CreateService<IWikiDocumentService>().GetDetailModel(docId);
 
             if (model == null)
             {

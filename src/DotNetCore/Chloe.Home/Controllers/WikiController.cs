@@ -15,14 +15,14 @@ namespace Chloe.Home.Controllers
         [ResponseCache(Duration = WebConsts.PageOutputCacheDuration, VaryByQueryKeys = new string[] { "id" })]
         public ActionResult Document(string id)
         {
-            List<WikiMenuItem> menuItems = this.CreateService<IWikiMenuItemAppService>().GetWikiMenuItems();
+            List<WikiMenuItem> menuItems = this.CreateService<IWikiMenuItemService>().GetWikiMenuItems();
             List<WikiMenuTreeNode> rootNodes = this.CreateTreeNodes(menuItems);
 
             this.ViewBag.RootNodes = rootNodes;
 
             string docId = id ?? rootNodes.First().ChildNodes.First().DocumentId;
 
-            WikiDocumentDetailModel model = this.CreateService<IWikiDocumentAppService>().GetDetailModel(docId);
+            WikiDocumentDetailModel model = this.CreateService<IWikiDocumentService>().GetDetailModel(docId);
 
             if (model == null)
             {

@@ -2,6 +2,26 @@
 /* 异步请求结果返回状态码 */
 var ResultStatus = { OK: 100, Failed: 101, NotLogin: 102, Unauthorized: 103 };
 
+String.formatDate = function (format) {
+    return formatDate(this, format);
+}
+
+function formatDate(date, format) {
+    if (!date || !format)
+        return "";
+
+    if (date.constructor == String) {
+        date = date.replace(/-/g, "/").replace("T", " ");//IE11里面不能直接转换带"-",必须先替换成"/"，如果有T也要替换，不然 2018/1/1T10:10 这种格式会有问题
+        date = new Date(date);
+    }
+
+    if (date.constructor == Date) {
+        return date.format(format);
+    }
+
+    return date;
+}
+
 Date.prototype.format = function (format) {
     var o =
         {
@@ -42,14 +62,99 @@ Array.prototype.select = function (selector) {
 };
 Array.prototype.first = function (predicate) {
     var arr = this;
-    var retArr = [];
     for (var i = 0; i < arr.length; i++) {
         var item = arr[i];
         if (predicate(item)) {
             return item;
         }
     }
-    return retArr;
+    return null;
+};
+Array.prototype.any = function (predicate) {
+    var arr = this;
+    var retArr = [];
+    for (var i = 0; i < arr.length; i++) {
+        var item = arr[i];
+        if (predicate(item)) {
+            return true;
+        }
+    }
+    return false;
+};
+Array.prototype.pushRange = function (items) {
+    for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        this.push(item);
+    }
+};
+Array.prototype.each = function (action) {
+    for (var i = 0; i < this.length; i++) {
+        var item = this[i];
+        action(item);
+    }
+};
+Array.prototype.sortBy = function (keySelector, rev) {
+    /*
+     *此方法返回一个新对象 
+     */
+    var arr = [];
+    for (var i = 0; i < this.length; i++) {
+        arr.push(this[i]);
+    }
+
+    //第二个参数没有传递 默认升序排列
+    rev = rev !== undefined && rev !== false;
+
+    var compare = function (a, b) {
+        a = keySelector(a);
+        b = keySelector(b);
+
+        if (rev)
+            return b - a;
+        else
+            return a - b;
+    }
+
+    arr.sort(compare);
+    return arr;
+}
+Array.prototype.orderBy = function (keySelector) {
+    return this.sortBy(keySelector, false);
+}
+Array.prototype.orderByDesc = function (keySelector) {
+    return this.sortBy(keySelector, true);
+}
+Array.prototype.groupBy = function (keySelector) {
+    var arr = this;
+    var ret = {};
+    for (var i = 0; i < arr.length; i++) {
+        var item = arr[i];
+        var key = keySelector(item);
+        var group;
+        if (key in ret) {
+            group = ret[key];
+        }
+        else {
+            group = [];
+            ret[key] = group;
+        }
+
+        group.push(item);
+    }
+
+    return ret;
+}
+
+
+
+function newGuid() {
+    var guid = "";
+    for (var i = 1; i <= 32; i++) {
+        var n = Math.floor(Math.random() * 16.0).toString(16);
+        guid += n;
+        if ((i == 8) || (i == 12) || (i == 16) || (i == 20)) guid += "-";
+    }
+    return guid;
 };
 
 /* $ace */
@@ -86,6 +191,22 @@ Array.prototype.first = function (predicate) {
     $ace.msg = function (msg) {
         layerMsg(msg);
     }
+    /* 加载提示，不会自动消失，需手动关闭 */
+    $ace.load = function (msg) {
+        var index = layer.msg(msg || "", {
+            icon: 16
+            , shade: 0.01
+            , time: 1024 * 1000 * 1000 //设置超长等待，最后手动关闭
+        });
+
+        var loader = {
+            close: function () {
+                layer.close(index);
+            }
+        };
+
+        return loader;
+    }
 
     $ace.reload = function () {
         location.reload();
@@ -102,11 +223,7 @@ Array.prototype.first = function (predicate) {
         for (var i = 0; i < arr.length; i++) {
             var ar = arr[i].split("=");
             if (ar[0].toLowerCase() == name) {
-                if (unescape(ar[1]) == 'undefined') {
-                    return "";
-                } else {
-                    return unescape(ar[1]);
-                }
+                return decodeURI(ar[1]);
             }
         }
         return "";
@@ -115,14 +232,13 @@ Array.prototype.first = function (predicate) {
     $ace.getQueryParams = function () {
         var params = {};
         var loc = window.location;
-        var se = decodeURIComponent(loc.search);
 
-        if (!se) {
+        if (!loc.search) {
             return params;
         }
 
         var paramsString;
-        paramsString = se.substr(1);//将?去掉
+        paramsString = loc.search.substr(1);//将?去掉
         var arr = paramsString.split("&");
         for (var i = 0; i < arr.length; i++) {
             var item = arr[i];
@@ -133,17 +249,39 @@ Array.prototype.first = function (predicate) {
             if (!paramName)
                 continue;
             var value = item.substr(index + 1);
-            params[paramName] = value;
+            params[paramName] = decodeURI(value);
         }
         return params;
     }
 
-    /* optionList: [{"Value" : "1", "Text" : "开发部"},{"Value" : "2", "Text" : "测试部"}] */
-    $ace.getOptionTextByValue = function (optionList, value, valuePropName, textPropName) {
-        valuePropName = valuePropName || "Value";
-        textPropName = textPropName || "Text";
+    $ace.findName = function (optionList, value, valuePropName, textPropName) {
+        valuePropName = valuePropName || "Id";
+        textPropName = textPropName || "Name";
+        return $ace.findText(optionList, value, valuePropName, textPropName);
+    }
+    $ace.findText = function (optionList, value, valuePropName, textPropName) {
+        if (optionList.length == 0)
+            return null;
 
-        var text = "";
+        var valuePropertyNames;
+        var textPropertyNames;
+        if (valuePropName) {
+            valuePropertyNames = [valuePropName];
+            textPropertyNames = [textPropName];
+        }
+        else {
+            valuePropertyNames = ["Id", "id", "Value", "value"];
+            textPropertyNames = ["Name", "name", "Text", "text"];
+        }
+
+        valuePropName = valuePropertyNames.first(function (name) {
+            return name in optionList[0];
+        });
+        textPropName = textPropertyNames.first(function (name) {
+            return name in optionList[0];
+        });
+
+        var text = null;
         var len = optionList.length;
         for (var i = 0; i < len; i++) {
             if (optionList[i][valuePropName] == value) {
@@ -153,6 +291,44 @@ Array.prototype.first = function (predicate) {
         }
 
         return text;
+    }
+
+    $ace.selectFields = function (items, fieldName) {
+        return items.select(function (item) {
+            return item[fieldName];
+        });
+    }
+    $ace.selectIds = function (items) {
+        if (items.length == 0)
+            return [];
+
+        var names = ["Id", "id", "ID"];
+
+        var name;
+        for (var i = 0; i < names.length; i++) {
+            if (names[i] in items[0]) {
+                name = names[i];
+                break;
+            }
+        }
+
+        return $ace.selectFields(items, name);
+    }
+    $ace.selectTexts = function (items) {
+        if (items.length == 0)
+            return [];
+
+        var names = ["Name", "name", "Text", "text"];
+
+        var name;
+        for (var i = 0; i < names.length; i++) {
+            if (names[i] in items[0]) {
+                name = names[i];
+                break;
+            }
+        }
+
+        return $ace.selectFields(items, name);
     }
 
     /* 依赖 bootstrap ui */
@@ -175,7 +351,7 @@ Array.prototype.first = function (predicate) {
 
 
     function execAjax(type, url, data, callback) {
-        var layerIndex = layer.load(1);
+        var layerIndex = layer.load(2);
         var ret = $.ajax({
             url: url,
             type: type,
@@ -280,7 +456,7 @@ Array.prototype.first = function (predicate) {
 /* $ 扩展 */
 (function ($) {
 
-    /* 设置 input 标签的值，同时触发 change 事件 */
+    /* 设置标签的值，同时触发 change 事件 */
     $.fn.setValue = function (val) {
         this.val(val);
         this.change();
@@ -325,23 +501,76 @@ Array.prototype.first = function (predicate) {
         return ret;
     };
 
-    $.fn.checked = function (value) {
-        if (value == true)
-            value = "true";
-        else if (value == false)
-            value = "false";
-
+    /* 设置 radio、checkbox 状态为选中 */
+    $.fn.checked = function () {
         for (var j = 0; j < this.length; j++) {
             var ele = this[j];
-            if (value === undefined || value === null)
-                ele.checked = true;
-            else {
-                if (ele.value == value)
-                    ele.checked = true;
-            }
+            var old = ele.checked;
+            ele.checked = true;
+            if (old != ele.checked)
+                $(ele).change();
         }
     }
-    $.fn.checkedValue = function () {
+    /* 设置 radio、checkbox 状态为未选中 */
+    $.fn.unchecked = function () {
+        for (var j = 0; j < this.length; j++) {
+            var ele = this[j];
+            var old = ele.checked;
+            ele.checked = false;
+            if (old != ele.checked)
+                $(ele).change();
+        }
+    }
+    /* 设置 radio、checkbox 状态。如果传入的 value 与控件的 value 相等，则设置为选中，否则不选中 */
+    $.fn.setChecked = function (value) {
+        var inputValues = [];
+
+        if (value instanceof Array) {
+            inputValues = value;
+        }
+        else {
+            inputValues.push(value);
+        }
+
+        var values = [];
+
+        for (var i = 0; i < inputValues.length; i++) {
+            var value = inputValues[i];
+            if (value === true)
+                values.push("true");
+            else if (value === false)
+                values.push("false");
+            else if (value !== undefined && value !== null) {
+                values.push(value);
+            }
+        }
+
+        for (var i = 0; i < this.length; i++) {
+            var ele = this[i];
+            var checked = false;
+            for (var j = 0; j < values.length; j++) {
+                var value = values[j];
+                if (ele.value == value) {
+                    checked = true;
+                    break;
+                }
+            }
+
+            var old = ele.checked;
+
+            if (checked) {
+                ele.checked = true;
+            }
+            else {
+                ele.checked = false;
+            }
+
+            if (old != ele.checked)
+                $(ele).change();
+        }
+    }
+    /* 获取被选中的 radio、checkbox 值 */
+    $.fn.getCheckedValue = function () {
         for (var j = 0; j < this.length; j++) {
             var ele = this[j];
             if (ele.checked == true) {
@@ -353,6 +582,7 @@ Array.prototype.first = function (predicate) {
     }
 
     $.fn.formValid = function () {
+        return true;//未做前端校验
         return $(this).valid({
             errorPlacement: function (error, element) {
                 element.parents('.formValue').addClass('has-error');
@@ -371,9 +601,9 @@ Array.prototype.first = function (predicate) {
     }
 
     $.fn.getFormData = function () {
-        var element = $(this);
+        var $form = $(this);
         var model = {};
-        element.find('input,select,textarea').each(function (r) {
+        $form.find('input,select,textarea').each(function (r) {
             var $this = $(this);
             var name = $this.attr('name');
 
@@ -381,10 +611,23 @@ Array.prototype.first = function (predicate) {
                 return;
 
             var type = $this.attr('type');
+            if ($this.attr("disabled") == "disabled")
+                return;
 
             switch (type) {
                 case "checkbox":
-                    model[name] = $this.is(":checked");
+                    var checkboxValues;
+                    if (name in model) {
+                        checkboxValues = model[name];
+                    }
+                    else {
+                        checkboxValues = [];
+                        model[name] = checkboxValues;
+                    }
+
+                    if (this.checked) {
+                        checkboxValues.push($this.val());
+                    }
                     break;
                 case "radio":
                     if (model[name] === undefined)
@@ -406,8 +649,8 @@ Array.prototype.first = function (predicate) {
         return model;
     };
     $.fn.setFormData = function (data) {
-        var element = $(this);
-        element.find('input,select,textarea').each(function (r) {
+        var $form = $(this);
+        $form.find('input,select,textarea').each(function (r) {
             var $ele = $(this);
             var name = $ele.attr('name');
 
@@ -419,18 +662,28 @@ Array.prototype.first = function (predicate) {
             var value = null;
             if (name in data)
                 value = data[name];
+            else
+                return;//如果模型中不存在相应的name属性，则不管
 
             switch (type) {
                 case "checkbox":
-                    /* 先不管，回头在搞 */
-                    //model[name] = $this.is(":checked");
+                    var values = value || []; //对于checkbox，value是一个数组
+
+                    for (var i = 0; i < $ele.length; i++) {
+                        var checkbox = $ele[i];
+                        var checkboxValue = checkbox.value;
+                        var checked = false;
+                        for (var j = 0; j < values.length; j++) {
+                            if (checkboxValue == values[j]) {
+                                checked = true;
+                                break;
+                            }
+                        }
+                        checkbox.checked = checked;
+                    }
                     break;
                 case "radio":
-                    if (value == true)
-                        value = "true";
-                    else if (value == false)
-                        value = "false";
-                    this.checked = this.value == value;
+                    $ele.setChecked(value);
                     break;
                 case "select":
                     $ele.val(value).trigger("change");
@@ -450,7 +703,7 @@ Array.prototype.first = function (predicate) {
             text: "Name",
             change: null,
             items: [],
-            placeholder: "--请选择--"
+            placeholder: "-请选择-"
         };
         var options = $.extend(defaults, options);
         var $element = $(this);
@@ -477,135 +730,192 @@ Array.prototype.first = function (predicate) {
         var $element = $(this);
         $element.removeAttr("disabled");
     }
+
+
+    $.loading = function (bool, text) {
+        var $loadingpage = top.$("#loadingPage");
+        var $loadingtext = $loadingpage.find('.loading-content');
+        if (bool) {
+            $loadingpage.show();
+        } else {
+            if ($loadingtext.attr('istableloading') == undefined) {
+                $loadingpage.hide();
+            }
+        }
+        if (!!text) {
+            $loadingtext.html(text);
+        } else {
+            $loadingtext.html("数据加载中，请稍后…");
+        }
+        $loadingtext.css("left", (top.$('body').width() - $loadingtext.width()) / 2 - 50);
+        $loadingtext.css("top", (top.$('body').height() - $loadingtext.height()) / 2);
+    }
 })($);
 
 
 
-function ViewModelBase() {
+function ViewModel() {
     var me = this;
 
-    me.SearchModel = _ob({});
-    me.DeleteUrl = null;
-    me.ModelKeyName = "Id"; /* 实体主键名称 */
+    me.searchModel = _ob({});
+    me.url = null;//加载数据的url
+    me.deleteUrl = null;
+    me.modelKeyName = "Id"; /* 实体主键名称 */
 
     /* 如有必要，子类需重写 DataTable、Dialog */
-    me.DataTable = new PagedDataTable(me);
-    me.Dialog = new DialogBase();
+    me.dataTable = new PagedDataTable(me);
+    me.dialog = new Dialog();
+
+    me.init = function () {
+        me.loadData();
+    }
 
     /* 添加按钮点击事件 */
-    me.Add = function () {
-        EnsureNotNull(me.Dialog, "Dialog");
-        me.Dialog.Open(null, "添加");
+    me.add = function () {
+        ensureNotNull(me.dialog, "dialog");
+        me.dialog.open(null, "添加");
     }
 
     /* 编辑按钮点击事件 */
-    me.Edit = function () {
-        EnsureNotNull(me.DataTable, "DataTable");
-        EnsureNotNull(me.Dialog, "Dialog");
-        me.Dialog.Open(me.DataTable.SelectedModel(), "修改");
+    me.edit = function () {
+        ensureNotNull(me.dataTable, "DataTable");
+        ensureNotNull(me.dialog, "Dialog");
+        me.dialog.open(me.dataTable.selectedModel(), "修改");
     }
 
     /* 删除按钮点击事件 */
-    me.Delete = function () {
-        $ace.confirm("确定要删除该条数据吗？", me.OnDelete);
+    me.del = function () {
+        $ace.confirm("确定要删除该条数据吗？", me.onDelete);
     }
 
-    me.OnDelete = function () {
-        DeleteRow();
+    me.onDelete = function () {
+        deleteRow();
     }
     /* 要求每行必须有 Id 属性，如果主键名不是 Id，则需要重写 me.ModelKeyName */
-    function DeleteRow() {
-        if (me.DeleteUrl == null)
+    function deleteRow() {
+        if (me.deleteUrl == null)
             throw new Error("未指定 DeleteUrl");
 
-        var url = me.DeleteUrl;
-        var params = { id: me.DataTable.SelectedModel()[me.ModelKeyName]() };
+        var url = me.deleteUrl;
+        var params = { id: me.dataTable.selectedModel()[me.modelKeyName]() };
         $ace.post(url, params, function (result) {
             var msg = result.Msg || "删除成功";
             $ace.msg(msg);
-            me.DataTable.RemoveSelectedModel();
+            me.dataTable.removeSelectedModel();
         });
     }
 
     /* 搜索按钮点击事件 */
-    me.Search = function () {
-        me.LoadModels();
+    me.search = function () {
+        me.loadData();
+    }
+    me.getSearchModel = function () {
+        var model = me.searchModel();
+        model = JSON.parse(JSON.stringify(model));
+        return model;
     }
 
-    /* 搜索数据逻辑，子类需要重写 */
-    me.LoadModels = function () {
-        throw new Error("未重写 LoadModels 方法");
+    /* 加载数据 */
+    me.loadData = function (page) {
+        if (me.url == null)
+            return;
+
+        var data = me.getSearchModel();
+        if (page)
+            data.page = page;
+        $ace.get(me.url, data, function (result) {
+            me.dataTable.setData(result.Data);
+        });
     }
 
-    function EnsureNotNull(obj, name) {
+    function ensureNotNull(obj, name) {
         if (!obj)
             throw new Error("属性 " + name + " 未初始化");
     }
 }
-function DataTableBase() {
+function DataTable(vmOrDataLoader) {
     var me = this;
 
-    me.Models = _oba([]);
-    me.SelectedModel = _ob(null);
+    me.models = _oba([]);
+    me.selectedModel = _ob(null);
 
-    me.GetOrdinal = function ($index) {
+    me.getOrdinal = function ($index) {
         return $index + 1;
     }
-    me.SelectRow = function (model, event) {
-        me.SelectedModel(model);
+    me.selectRow = function (model, event) {
+        me.selectedModel(model);
         $ace.selectRow(event.currentTarget);
         return true;
     }
-    me.RemoveSelectedModel = function () {
-        var selectedModel = me.SelectedModel();
+    me.removeSelectedModel = function () {
+        var selectedModel = me.selectedModel();
         if (selectedModel) {
-            me.Models.remove(selectedModel);
+            me.models.remove(selectedModel);
         }
     }
 
-    me.SetModels = function (models) {
+    me.setData = function (models) {
         var wrapedModels = $ko.toOb(models);
-        me.Models(wrapedModels);
+        me.models(wrapedModels);
+        me.selectedModel(null);
+    }
+    me.setModels = function (models) {
+        me.setData();
+    }
+
+    me.reload = function () {
+        if (!vmOrDataLoader)
+            throw new Error("未实现 loadData 方法");
+
+        if ($.isFunction(vmOrDataLoader)) {
+            vmOrDataLoader();
+        }
+        else {
+            if ("loadData" in vmOrDataLoader)
+                vmOrDataLoader.loadData();
+            else
+                throw new Error("vmOrDataLoader 未实现 loadData 方法");
+        }
     }
 }
-function PagedDataTable(vmOrLoadModelsFn) {
+function PagedDataTable(vmOrDataLoader) {
     var me = this;
-    DataTableBase.call(me);
+    DataTable.call(me, vmOrDataLoader);
 
-    me.ShowFirstPage = _ob(false);
-    me.ShowLastPage = _ob(false);
-    me.TotalCount = _ob(0);
-    me.TotalPage = _ob(0);
-    me.CurrentPage = _ob(0);
-    me.SkipPage = _ob(0);
-    me.PageSize = _ob(0);
+    me.showFirstPage = _ob(false);
+    me.showLastPage = _ob(false);
+    me.totalCount = _ob(0);
+    me.totalPage = _ob(0);
+    me.currentPage = _ob(0);
+    me.skipPage = _ob(0);
+    me.pageSize = _ob(0);
 
-    me.ShowPages = _oba();
+    me.showPages = _oba();
 
-    me.GetOrdinal = function ($index) {
-        return (me.CurrentPage() - 1) * me.PageSize() + $index + 1;
+    me.getOrdinal = function ($index) {
+        return (me.currentPage() - 1) * me.pageSize() + $index + 1;
     }
 
-    me.SetPagedData = function (pagedData) {
+    me.setData = function (pagedData) {
         var wrapedData = $ko.toOb(pagedData);
-        me.Models(wrapedData.DataList());
-        me.TotalCount(wrapedData.TotalCount());
-        me.TotalPage(wrapedData.TotalPage());
-        me.CurrentPage(wrapedData.CurrentPage());
-        me.SkipPage(wrapedData.CurrentPage());
-        me.PageSize(wrapedData.PageSize());
+        me.models(wrapedData.Models());
+        me.totalCount(wrapedData.TotalCount());
+        me.totalPage(wrapedData.TotalPage());
+        me.currentPage(wrapedData.CurrentPage());
+        me.skipPage(wrapedData.CurrentPage());
+        me.pageSize(wrapedData.PageSize());
 
         var showPageCount = 6;
 
-        var min = me.CurrentPage() - (showPageCount / 2);
+        var min = me.currentPage() - (showPageCount / 2);
 
         if (min < 1)
             min = 1;
 
         var max = min + showPageCount;
 
-        if (max > me.TotalPage()) {
-            max = me.TotalPage();
+        if (max > me.totalPage()) {
+            max = me.totalPage();
             min = max - showPageCount;
             if (min < 1)
                 min = 1;
@@ -615,83 +925,95 @@ function PagedDataTable(vmOrLoadModelsFn) {
         for (var i = min; i <= max; i++) {
             showPages.push(i);
         }
-        me.ShowPages(showPages);
+        me.showPages(showPages);
 
-        me.ShowFirstPage(min != 1);
-        me.ShowLastPage(max != me.TotalPage());
+        me.showFirstPage(min != 1);
+        me.showLastPage(max != me.totalPage());
+        me.selectedModel(null);
     }
-    me.ToPage = function (page) {
-        if (page < 1 || page > me.TotalPage() || page == me.CurrentPage())
+    me.setPagedData = function (pagedData) {
+        me.setData();
+    }
+    me.toPage = function (page) {
+        if (page < 1 || page > me.totalPage() || page == me.currentPage())
             return;
-        me.LoadModels(page);
+        me.loadData(page);
     }
 
-    me.LoadModels = function (page) {
-        if (!vmOrLoadModelsFn)
-            throw new Error("未实现 LoadModels 方法");
+    me.loadData = function (page) {
+        if (!vmOrDataLoader)
+            throw new Error("未实现 loadData 方法");
 
-        if (isFunction(vmOrLoadModelsFn)) {
-            vmOrLoadModelsFn(page);
+        if ($.isFunction(vmOrDataLoader)) {
+            vmOrDataLoader(page);
         }
         else {
-            if ("LoadModels" in vmOrLoadModelsFn)
-                vmOrLoadModelsFn.LoadModels(page);
+            if ("loadData" in vmOrDataLoader)
+                vmOrDataLoader.loadData(page);
             else
-                throw new Error("vmOrLoadModelsFn 未实现 LoadModels 方法");
+                throw new Error("vmOrDataLoader 未实现 loadData 方法");
         }
     }
+    me.reload = function () {
+        me.loadData(me.currentPage());
+    }
+
 
     function isFunction(obj) {
         return typeof obj === "function";
     }
 }
-function DialogBase() {
+function Dialog() {
     var me = this;
 
     /* must */
-    me.Title = _ob(null);
-    me.IsShow = _ob(false);
+    me.title = _ob(null);
+    me.isShow = _ob(false);
 
-    me.EditModel = _ob(null);
-    me.Model = _ob({});//绑定到界面的 model
+    me.editModel = _ob(null);
+    me.model = _ob({});//绑定到界面的 model
     /* end must */
 
     /* must */
-    me.Close = function () {
-        me.IsShow(false);
+    me.close = function () {
+        me.isShow(false);
     }
-    me.Open = function (model, title) {
-        me.IsShow(true);
-        me.Model({});
+    me.open = function (model, title) {
+        if (me.isShow()) {
+            me.isShow(false);//确保触发值改变事件。有时候当模态框处于未打开状态时me.isShow()的值依然是true，比如按esc关闭模态框后
+        }
+        me.isShow(true);
+
+        me.model({});
         if (model) {
-            me.EditModel(model);
+            me.editModel(model);
         }
         else {
-            me.EditModel(null);
+            me.editModel(null);
         }
 
         if (title)
-            me.Title(title);
+            me.title(title);
 
-        me.OnOpen();
+        me.onOpen();
     }
-    me.Save = function () {
-        me.OnSave();
+    me.save = function () {
+        me.onSave();
     }
     /* end must */
 
 
-    me.OnOpen = function () {
-        var model = me.EditModel();
+    me.onOpen = function () {
+        var model = me.editModel();
         if (model) {
             var bindModel = $ko.toJS(model);
-            me.Model(bindModel);
+            me.model(bindModel);
         }
         else {
-            me.Model({});
+            me.model({});
         }
     }
-    me.OnSave = function () {
+    me.onSave = function () {
         throw new Error("未重写 OnSave 方法");
     }
 }

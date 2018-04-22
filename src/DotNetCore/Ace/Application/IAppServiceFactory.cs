@@ -8,6 +8,6 @@ namespace Ace.Application
 {
     public interface IAppServiceFactory : IDisposable
     {
-        T CreateService<T>() where T : IAppService;
+        T CreateService<T>();
     }
 }

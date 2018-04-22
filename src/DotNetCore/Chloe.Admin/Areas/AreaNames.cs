@@ -7,7 +7,7 @@ namespace Chloe.Admin.Areas
 {
     public static class AreaNames
     {
-        public const string SystemManage = "SystemManage";
-        public const string WikiManage = "WikiManage";
+        public const string System = "System";
+        public const string Wiki = "Wiki";
     }
 }

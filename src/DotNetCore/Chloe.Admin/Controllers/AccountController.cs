@@ -13,6 +13,8 @@ using Ace.Web;
 using Ace.Application.System;
 using Microsoft.AspNetCore.Http;
 using Ace.Entity.System;
+using Ace.Web.Mvc.Authorization;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Chloe.Admin.Controllers
 {
@@ -28,11 +30,11 @@ namespace Chloe.Admin.Controllers
         }
 
         [HttpPost]
-        public ActionResult Login(string userName, string password/*经过md5加密后的密码*/, string verifyCode)
+        public ActionResult Login(string loginName, string password/*经过md5加密后的密码*/, string verifyCode)
         {
             //if (verifyCode.IsNullOrEmpty())
             //    return this.FailedMsg("请输入验证码");
-            if (userName.IsNullOrEmpty() || password.IsNullOrEmpty())
+            if (loginName.IsNullOrEmpty() || password.IsNullOrEmpty())
                 return this.FailedMsg("用户名/密码不能为空");
 
             //string code = WebHelper.GetSession<string>(VerifyCodeKey);
@@ -42,38 +44,39 @@ namespace Chloe.Admin.Controllers
             //    return this.FailedMsg("验证码错误，请重新输入");
             //}
 
-            userName = userName.Trim();
-            var accountAppService = this.CreateService<IAccountAppService>();
+            loginName = loginName.Trim();
+            var accountAppService = this.CreateService<IAccountService>();
 
             const string moduleName = "系统登录";
             string ip = this.HttpContext.GetClientIP();
 
             Sys_User user;
             string msg;
-            if (!accountAppService.CheckLogin(userName, password, out user, out msg))
+            if (!accountAppService.CheckLogin(loginName, password, out user, out msg))
             {
-                this.CreateService<ISysLogAppService>().LogAsync(null, null, ip, LogType.Login, moduleName, false, "用户[{0}]登录失败：{1}".ToFormat(userName, msg));
+                this.CreateService<ISysLogAppService>().LogAsync(null, null, ip, LogType.Login, moduleName, false, "用户[{0}]登录失败：{1}".ToFormat(loginName, msg));
                 return this.FailedMsg(msg);
             }
 
             AdminSession session = new AdminSession();
             session.UserId = user.Id;
-            session.UserName = user.UserName;
-            session.RealName = user.RealName;
-            session.DepartmentId = user.DepartmentId;
-            session.DutyId = user.DutyId;
-            session.RoleId = user.RoleId;
+            session.AccountName = user.AccountName;
+            session.Name = user.Name;
+            //session.OrgIds = user.OrgIds;
+            //session.RoleIds = user.RoleIds;
             session.LoginIP = ip;
-            session.LoginTime = DateTime.Now;
-            session.IsAdmin = user.UserName.ToLower() == AppConsts.AdminUserName;
-            
+            session.IsAdmin = user.AccountName.ToLower() == AppConsts.AdminUserName;
+
             this.CurrentSession = session;
 
-            this.CreateService<ISysLogAppService>().LogAsync(user.Id, user.RealName, ip, LogType.Login, moduleName, true, "登录成功");
+            this.CreateService<ISysLogAppService>().LogAsync(user.Id, user.Name, ip, LogType.Login, moduleName, true, "登录成功");
             return this.SuccessMsg(msg);
         }
-        public ActionResult Logout()
+        public ActionResult Logout([FromServices]IMemoryCache memoryCache)
         {
+            //http://www.cnblogs.com/sheng-jie/p/6970091.html
+            //https://github.com/aspnetboilerplate/aspnetboilerplate/blob/dev/src/Abp/Events/Bus/EventBus.cs
+            memoryCache.Remove(WebPermissionFilter.USER_PERMITS_CACHE_KEY + this.CurrentSession.UserId);
             this.CurrentSession = null;
             return RedirectToAction("Login");
         }
@@ -90,21 +93,17 @@ namespace Chloe.Admin.Controllers
         }
 
 
-        [LoginAuthorizeAttribute]
+        [LoginAttribute]
         [HttpGet]
         public ActionResult Index()
         {
             var service = this.CreateService<IEntityAppService>();
             Sys_User user = service.GetByKey<Sys_User>(this.CurrentSession.UserId);
-            Sys_Department department = string.IsNullOrEmpty(user.DepartmentId) ? null : service.GetByKey<Sys_Department>(user.DepartmentId);
-            Sys_Duty duty = string.IsNullOrEmpty(user.DutyId) ? null : service.GetByKey<Sys_Duty>(user.DutyId);
-            Sys_Role role = string.IsNullOrEmpty(user.RoleId) ? null : service.GetByKey<Sys_Role>(user.RoleId);
+            //Sys_Role role = string.IsNullOrEmpty(user.RoleId) ? null : service.GetByKey<Sys_Role>(user.RoleId);
 
             UserModel model = new UserModel();
             model.User = user;
-            model.DepartmentName = department == null ? null : department.Name;
-            model.DutyName = duty == null ? null : duty.Name;
-            model.RoleName = role == null ? null : role.Name;
+            //model.RoleName = role == null ? null : role.Name;
 
             this.ViewBag.UserInfo = model;
 
@@ -117,18 +116,21 @@ namespace Chloe.Admin.Controllers
         /// <param name="oldPassword">明文</param>
         /// <param name="newPassword">明文</param>
         /// <returns></returns>
-        [LoginAuthorizeAttribute]
+        [Permission("account.change_password")]
+        [LoginAttribute]
         [HttpPost]
         public ActionResult ChangePassword(string oldPassword, string newPassword)
         {
-            this.CreateService<IAccountAppService>().ChangePassword(oldPassword, newPassword);
+            this.CreateService<IAccountService>().ChangePassword(oldPassword, newPassword);
             return this.SuccessMsg("密码修改成功");
         }
-        [LoginAuthorizeAttribute]
+
+        [Permission("account.modify_info")]
+        [LoginAttribute]
         [HttpPost]
         public ActionResult ModifyInfo(ModifyAccountInfoInput input)
         {
-            this.CreateService<IAccountAppService>().ModifyInfo(input);
+            this.CreateService<IAccountService>().ModifyInfo(input);
             return this.SuccessMsg("修改成功");
         }
     }
@@ -136,8 +138,5 @@ namespace Chloe.Admin.Controllers
     public class UserModel
     {
         public Sys_User User { get; set; }
-        public string DepartmentName { get; set; }
-        public string DutyName { get; set; }
-        public string RoleName { get; set; }
     }
 }

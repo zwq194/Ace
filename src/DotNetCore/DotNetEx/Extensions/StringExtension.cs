@@ -47,7 +47,19 @@ namespace System
         {
             return !string.IsNullOrWhiteSpace(s);
         }
+        public static bool Contains(this string s, string keyword, bool ignoreCase)
+        {
+            if (keyword == null || s.IsNullOrEmpty())
+                return false;
 
+            if (ignoreCase)
+            {
+                s = s.ToLower();
+                keyword = keyword.ToLower();
+            }
+
+            return s.Contains(keyword);
+        }
         /// <summary>
         /// 将字符串中的 Encoding.Default 编码为一个字节序列。
         /// </summary>
@@ -198,20 +210,41 @@ namespace System
             return e;
         }
 
-        public static List<string> SplitAsList(this string s, params char[] separator)
+        /// <summary>
+        /// 使用 StringSplitOptions.RemoveEmptyEntries 分割字符串
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static List<string> SplitString(this string s, params char[] separator)
         {
-            return s.SplitAsList<string>(separator);
+            return SplitStringImpl<string>(s, separator);
+        }
+        public static List<string> SplitString(this string s, char separator = ',')
+        {
+            return SplitStringImpl<string>(s, separator);
         }
 
-        public static List<T> SplitAsList<T>(this string s, params char[] separator)
+        /// <summary>
+        /// 使用 StringSplitOptions.RemoveEmptyEntries 分割字符串，并转成 T 类型
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="s"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static List<T> SplitString<T>(this string s, params char[] separator)
+        {
+            return SplitStringImpl<T>(s, separator);
+        }
+
+        static List<T> SplitStringImpl<T>(this string s, params char[] separator)
         {
             List<T> retList = new List<T>();
 
             if (string.IsNullOrEmpty(s))
                 return retList;
 
-            string[] arr = s.Split(separator);
-
+            string[] arr = s.Split(separator, StringSplitOptions.RemoveEmptyEntries);
             foreach (string item in arr)
             {
                 if (item is T)

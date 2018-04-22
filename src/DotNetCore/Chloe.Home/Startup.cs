@@ -77,7 +77,7 @@ namespace Chloe.Home
             loggerFactory.AddNLog();
             app.AddNLogWeb();
 
-            Globals.ServiceProvider = app.ApplicationServices;
+            Globals.Services = app.ApplicationServices;
             AceMapper.InitializeMap(); /* 初始化 AutoMapper */
 
             if (env.IsDevelopment())
@@ -101,8 +101,7 @@ namespace Chloe.Home
             app.UseStaticFiles();
 
             app.UseAuthentication();
-
-
+ 
             app.UseSession();
             app.UseResponseCaching();
             app.UseMvc(routes =>

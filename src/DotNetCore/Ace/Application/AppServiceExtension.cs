@@ -9,9 +9,6 @@ namespace Ace.Application
 {
     public static class AppServiceExtension
     {
-        public static string CreateId(this IAppService service)
-        {
-            return IdHelper.CreateGuid();
-        }
+
     }
 }

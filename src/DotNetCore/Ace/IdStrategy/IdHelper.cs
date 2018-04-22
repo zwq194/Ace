@@ -16,7 +16,11 @@ namespace Ace.IdStrategy
 
         public static long CreateSnowflakeId()
         {
-            return Snowflake.Instance.GetId();
+            return Snowflake.IdWorker.Instance.NextId();
+        }
+        public static string CreateStringSnowflakeId()
+        {
+            return CreateSnowflakeId().ToString();
         }
     }
 }

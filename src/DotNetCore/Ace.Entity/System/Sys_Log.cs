@@ -12,7 +12,7 @@ namespace Ace.Entity.System
         [Sequence("Sys_Log_AUTOID")]
         public int Id { get; set; }
         public string UserId { get; set; }
-        public string RealName { get; set; }
+        public string UserName { get; set; }
         public LogType Type { get; set; }
         public string IP { get; set; }
         public string IPAddress { get; set; }

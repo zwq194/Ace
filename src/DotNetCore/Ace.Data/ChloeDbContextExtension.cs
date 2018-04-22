@@ -125,7 +125,7 @@ namespace Chloe
                         /* 如果未设置主键值，则自动设置为 guid */
                         if (primaryKeyDescriptor.MemberInfoType == typeof(string))
                         {
-                            primaryKeyDescriptor.SetValue(entity, IdHelper.CreateGuid());
+                            primaryKeyDescriptor.SetValue(entity, IdHelper.CreateSnowflakeId().ToString());
                         }
                         else if (primaryKeyDescriptor.MemberInfoType.GetUnderlyingType() == typeof(Guid))
                         {
@@ -222,7 +222,7 @@ namespace Chloe
             {
                 throw new ArgumentException("未能从 dto 中找到主键或主键为空");
             }
-
+            
             return dbContext.Update<TEntity>(key, bindings);
         }
 

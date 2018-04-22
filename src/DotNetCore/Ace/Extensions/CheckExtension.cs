@@ -13,7 +13,7 @@ namespace System
         public static void NotNull<T>(this T val, string errorMsg = null)
         {
             if (val == null)
-                throw new InvalidDataException(errorMsg);
+                throw new InvalidInputException(errorMsg);
         }
         public static void NotNullOrEmpty(this object val, string errorMsg = null)
         {
@@ -30,7 +30,7 @@ namespace System
         public static void NotNullOrEmpty(this string val, string errorMsg = null)
         {
             if (string.IsNullOrEmpty(val))
-                throw new InvalidDataException(errorMsg);
+                throw new InvalidInputException(errorMsg);
         }
         public static void EnsureValid(this object obj)
         {
@@ -40,7 +40,7 @@ namespace System
                     (obj, vc, validationResults, true);
             if (isValid == false)
             {
-                throw new InvalidDataException(validationResults[0].ErrorMessage);
+                throw new InvalidInputException(validationResults[0].ErrorMessage);
             }
         }
     }

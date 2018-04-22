@@ -78,7 +78,7 @@ namespace Chloe
         {
             PagedData<T> pageData = page.ToPagedData<T>();
 
-            pageData.DataList = q.TakePage(page.Page, page.PageSize).ToList();
+            pageData.Models = q.TakePage(page.Page, page.PageSize).ToList();
             pageData.TotalCount = q.Count();
 
             return pageData;

@@ -371,6 +371,19 @@
         }
     };
 
+    ko.bindingHandlers['class'] = {
+        'init': function (element, valueAccessor, allBindingsAccessor) {
+        },
+        'update': function (element, valueAccessor, allBindingsAccessor) {
+            var className = ko.utils.unwrapObservable(valueAccessor());
+
+            if ((className === null) || (className === undefined) || className == "") {
+                return;
+            }
+
+            $(element).addClass(className);
+        }
+    }
 
     var $ko = {};
     $ko.toOb = function (obj) {
