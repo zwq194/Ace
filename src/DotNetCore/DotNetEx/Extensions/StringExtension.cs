@@ -134,7 +134,7 @@ namespace System
 
             return defaultValue;
         }
-        public static short? ToInt16(this string s, short? defaultValue = null)
+        public static short? ToShort(this string s, short? defaultValue = null)
         {
             short val;
             if (short.TryParse(s, out val))
@@ -142,7 +142,7 @@ namespace System
 
             return defaultValue;
         }
-        public static int? ToInt32(this string s, int? defaultValue = null)
+        public static int? ToInt(this string s, int? defaultValue = null)
         {
             int val;
             if (int.TryParse(s, out val))
@@ -150,7 +150,7 @@ namespace System
 
             return defaultValue;
         }
-        public static long? ToInt64(this string s, long? defaultValue = null)
+        public static long? ToLong(this string s, long? defaultValue = null)
         {
             long val;
             if (long.TryParse(s, out val))

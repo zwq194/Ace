@@ -331,6 +331,41 @@ function newGuid() {
         return $ace.selectFields(items, name);
     }
 
+    $ace.browser = function () {
+        var userAgent = navigator.userAgent;
+        var isOpera = userAgent.indexOf("Opera") > -1;
+        if (isOpera) {
+            return "Opera"
+        };
+        if (userAgent.indexOf("Firefox") > -1) {
+            return "FF";
+        }
+        if (userAgent.indexOf("Chrome") > -1) {
+            if (window.navigator.webkitPersistentStorage.toString().indexOf('DeprecatedStorageQuota') > -1) {
+                return "Chrome";
+            } else {
+                return "360";
+            }
+        }
+        if (userAgent.indexOf("Safari") > -1) {
+            return "Safari";
+        }
+        if (userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1 && !isOpera) {
+            return "IE";
+        };
+    }
+    $ace.download = function (url, data, method) {
+        if (url && data) {
+            data = typeof data == 'string' ? data : jQuery.param(data);
+            var inputs = '';
+            $.each(data.split('&'), function () {
+                var pair = this.split('=');
+                inputs += '<input type="hidden" name="' + pair[0] + '" value="' + pair[1] + '" />';
+            });
+            $('<form action="' + url + '" method="' + (method || 'post') + '">' + inputs + '</form>').appendTo('body').submit().remove();
+        };
+    };
+
     /* 依赖 bootstrap ui */
     $ace.selectRow = function (selectedTr) {
         var c = "warning";

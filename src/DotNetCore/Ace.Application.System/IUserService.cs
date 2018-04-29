@@ -216,7 +216,7 @@ namespace Ace.Application.System
                 if (AceUtils.IsMobilePhone(mobilePhone) == false)
                     throw new InvalidInputException("请输入正确的手机号码");
 
-                if (user.MobilePhone != mobilePhone)//不等说明手机号码没变
+                if (user.MobilePhone != mobilePhone)//不等说明手机号码有变
                 {
                     bool exists = this.DbContext.Query<Sys_User>().Where(a => a.MobilePhone == mobilePhone).Any();
                     if (exists)
@@ -236,7 +236,7 @@ namespace Ace.Application.System
                 if (AceUtils.IsEmail(email) == false)
                     throw new InvalidInputException("请输入正确的邮箱地址");
 
-                if (user.Email != email)//不等说明手机号码没变
+                if (user.Email != email)//不等说明邮箱有变
                 {
                     bool exists = this.DbContext.Query<Sys_User>().Where(a => a.Email == email).Any();
                     if (exists)
@@ -383,11 +383,9 @@ namespace Ace.Application.System
             PagedData<Sys_User> pagedData = q.TakePageData(page);
 
             List<string> userIds = pagedData.Models.Select(a => a.Id).ToList();
-            //List<string> orgIds = pagedData.Models.SelectMany(a => a.OrgIds.SplitString()).Distinct().ToList();
             List<string> postIds = pagedData.Models.SelectMany(a => a.PostIds.SplitString()).Distinct().ToList();
             List<string> roleIds = pagedData.Models.SelectMany(a => a.RoleIds.SplitString()).Distinct().ToList();
 
-            //List<Sys_Org> orgs = this.DbContext.Query<Sys_Org>().Where(a => orgIds.Contains(a.Id)).ToList();
             List<Sys_Post> posts = this.DbContext.Query<Sys_Post>().Where(a => a.Id.In(postIds)).ToList();
             List<Sys_Role> roles = this.DbContext.Query<Sys_Role>().Where(a => a.Id.In(roleIds)).ToList();
 
@@ -397,7 +395,6 @@ namespace Ace.Application.System
 
             foreach (Sys_User user in pagedData.Models)
             {
-                //List<string> userOrgIds = user.OrgIds.SplitString();
                 user.UserOrgs.AddRange(userOrgs.Where(a => a.UserId == user.Id));
 
                 List<string> userPostIds = user.PostIds.SplitString();

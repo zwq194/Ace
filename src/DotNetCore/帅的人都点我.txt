@@ -3,7 +3,7 @@ AceFx 项目使用 ASP.NET CORE 开发(src/DotNetCore目录)，需要使用 vs2017 打开。
 
 数据库默认使用 SQLite，启动运行前请在配置文件中（configs/appsettings.json）配置好 SQLite 的db文件（db文件位于项目db文件夹中）。
 
-亦支持 SqlServer，MySql 以及 Oracle（目前未准备有相应的数据库脚本，得自己手动建表），创建相关的表后修改配置文件（configs/appsettings.json）内数据库连接配置即可。
+亦支持 SqlServer，MySql 以及 Oracle（脚本位于db文件夹中），创建相关的表后修改配置文件（configs/appsettings.json）内数据库连接配置即可。
 
 后台默认登录帐号 admin，密码 52chloe
 

@@ -23,7 +23,7 @@ namespace System
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
-        public static int ToInt32(this Enum e)
+        public static int ToInt(this Enum e)
         {
             int ret = Convert.ToInt32(e);
             return ret;

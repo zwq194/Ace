@@ -111,18 +111,20 @@
             var dataId = $(this).attr('data-id');
 
             var dataUrl = $(this).attr('href');
+            dataUrl = dataUrl || "";
+            if (!dataUrl)
+                return false;
+
             var menuName = $.trim($(this).text());
             var flag = true;
-            if (dataUrl == undefined || $.trim(dataUrl).length == 0) {
-                return false;
-            }
+
             $('.menuTab').each(function () {
-                if ($(this).data('id') == dataUrl) {
+                if ($(this).data('id') == dataId) {
                     if (!$(this).hasClass('active')) {
                         $(this).addClass('active').siblings('.menuTab').removeClass('active');
                         $.fxtab.scrollToTab(this);
                         $('.mainContent .Ace_iframe').each(function () {
-                            if ($(this).data('id') == dataUrl) {
+                            if ($(this).data('id') == dataId) {
                                 $(this).show().siblings('.Ace_iframe').hide();
                                 return false;
                             }
@@ -133,9 +135,9 @@
                 }
             });
             if (flag) {
-                var str = '<a href="javascript:;" class="active menuTab" data-id="' + dataUrl + '">' + menuName + ' <i class="fa fa-remove"></i></a>';
+                var str = '<a href="javascript:;" class="active menuTab" data-id="' + dataId + '">' + menuName + ' <i class="fa fa-remove"></i></a>';
                 $('.menuTab').removeClass('active');
-                var str1 = '<iframe class="Ace_iframe" id="iframe' + dataId + '" name="iframe' + dataId + '"  width="100%" height="100%" src="' + dataUrl + '" frameborder="0" data-id="' + dataUrl + '" seamless></iframe>';
+                var str1 = '<iframe class="Ace_iframe" id="iframe' + dataId + '" name="iframe' + dataId + '"  width="100%" height="100%" src="' + dataUrl + '" frameborder="0" data-id="' + dataId + '" seamless></iframe>';
                 $('.mainContent').find('iframe.Ace_iframe').hide();
                 $('.mainContent').append(str1);
                 $.loading(true);
