@@ -14,12 +14,12 @@ namespace Ace.Application.System
         public string Description { get; set; }
     }
 
-    [MapToType(typeof(Sys_Post))]
+    [MapToType(typeof(SysPost))]
     public class AddPostInput : PostInputBase
     {
     }
 
-    [MapToType(typeof(Sys_Post))]
+    [MapToType(typeof(SysPost))]
     public class UpdatePostInput : PostInputBase
     {
         [RequiredAttribute(ErrorMessage = "{0}不能为空")]

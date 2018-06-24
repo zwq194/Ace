@@ -67,7 +67,7 @@ namespace Ace.Application
 
             allTypes = allTypes.Where(a =>
             {
-                var b = a.IsAbstract == false && a.IsClass && typeof(IAppService).IsAssignableFrom(a) && a.GetConstructor(Type.EmptyTypes) != null;
+                var b = a.IsAbstract == false && a.IsClass && typeof(IAppService).IsAssignableFrom(a);
                 return b;
             });
 

@@ -50,54 +50,37 @@ namespace Chloe.Admin.Controllers
             IUserService userService = this.CreateService<IUserService>();
             IPermissionService authService = this.CreateService<IPermissionService>();
 
-            Dictionary<string, Sys_Permission> userPermissionDic = null;
+            Dictionary<string, SysPermission> userPermissionDic = null;
             if (!this.CurrentSession.IsAdmin)
             {
-                List<Sys_Permission> userPermissions = userService.GetUserPermissions(this.CurrentSession.UserId);
+                List<SysPermission> userPermissions = userService.GetUserPermissions(this.CurrentSession.UserId);
                 userPermissionDic = userPermissions.ToDictionary(a => a.Id);
             }
 
-            List<Sys_Permission> permissionMenus = authService.GetPermissionMenus();
+            List<SysPermission> permissionMenus = authService.GetPermissionMenus();
 
-            List<Sys_Permission> parentPermissions = permissionMenus.Where(a => a.ParentId == null).ToList();
+            List<SysPermission> parentPermissions = permissionMenus.Where(a => a.ParentId == null).ToList();
 
-            foreach (Sys_Permission item in parentPermissions)
+            foreach (SysPermission item in parentPermissions)
             {
                 PermissionMenu permissionMenu = PermissionMenu.Create(item);
 
                 List<PermissionMenu> childMenus = new List<PermissionMenu>();
                 GatherChildMenus(permissionMenus, item, childMenus, userPermissionDic);
-                //var childPermissions = permissionMenus.Where(a => a.ParentId == item.Id);
-                //foreach (Sys_Permission childPermission in childPermissions)
-                //{
-                //    if (!this.CurrentSession.IsAdmin)
-                //    {
-                //        if (childPermission.Type != PermissionType.公共菜单 && !userPermissionDic.ContainsKey(childPermission.Id))
-                //            continue;
-                //    }
-
-                //    permissionMenu.Children.Add(PermissionMenu.Create(childPermission));
-                //}
 
                 permissionMenu.Children.AddRange(childMenus);
                 ret.Add(permissionMenu);
             }
 
-            //ret = ret.Where(a => a.Type != AuthType.节点组 || (a.Type == AuthType.节点组 && a.Children.Count > 0)).ToList();
             ret = ret.Where(a => !(a.Type == PermissionType.节点组 && a.Children.Count == 0)).OrderBy(a => a.SortCode).ToList();
-
-            //foreach (var item in ret)
-            //{
-            //    item.Children = item.Children.ToList();
-            //}
 
             return ret;
         }
 
-        void GatherChildMenus(List<Sys_Permission> permissions, Sys_Permission permission, List<PermissionMenu> list, Dictionary<string, Sys_Permission> userPermissionDic)
+        void GatherChildMenus(List<SysPermission> permissions, SysPermission permission, List<PermissionMenu> list, Dictionary<string, SysPermission> userPermissionDic)
         {
             var childPermissions = permissions.Where(a => a.ParentId == permission.Id).OrderBy(a => a.SortCode);
-            foreach (Sys_Permission childPermission in childPermissions)
+            foreach (SysPermission childPermission in childPermissions)
             {
                 if (childPermission.Type == PermissionType.节点组)
                 {
@@ -127,7 +110,7 @@ namespace Chloe.Admin.Controllers
         public int SortCode { get; set; }
         public List<PermissionMenu> Children { get; set; } = new List<PermissionMenu>();
 
-        public static PermissionMenu Create(Sys_Permission permission)
+        public static PermissionMenu Create(SysPermission permission)
         {
             PermissionMenu ret = new PermissionMenu()
             {

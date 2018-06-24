@@ -47,7 +47,7 @@ namespace Chloe.Admin.Areas.System.Controllers
 
         List<PermissionModel> GetPermissionModels()
         {
-            List<Sys_Permission> data = this.Service.GetList(PermissionType.节点组);
+            List<SysPermission> data = this.Service.GetList(PermissionType.节点组);
 
             foreach (var item in data)
             {
@@ -61,7 +61,7 @@ namespace Chloe.Admin.Areas.System.Controllers
 
             return models;
         }
-        void Fill(List<PermissionModel> container, List<Sys_Permission> permissions, int level)
+        void Fill(List<PermissionModel> container, List<SysPermission> permissions, int level)
         {
             foreach (var permission in permissions)
             {
@@ -113,7 +113,7 @@ namespace Chloe.Admin.Areas.System.Controllers
         public string Id { get; set; }
         public string Name { get; set; }
 
-        public static PermissionModel Create(Sys_Permission entity, int level = 0)
+        public static PermissionModel Create(SysPermission entity, int level = 0)
         {
             PermissionModel ret = new PermissionModel() { Id = entity.Id, Name = entity.Name };
 

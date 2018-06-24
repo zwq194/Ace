@@ -1,13 +1,15 @@
-﻿using System;
+﻿using Chloe.Annotations;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Ace.Entity.System
 {
-    public class Sys_RolePermission
+    [Table("Sys_UserPermission")]
+    public class SysUserPermission
     {
         public string Id { get; set; }
-        public string RoleId { get; set; }
+        public string UserId { get; set; }
         public string PermissionId { get; set; }
     }
 }

@@ -26,7 +26,7 @@ namespace Chloe.Admin.Common
         {
             ClaimsPrincipal user = filterContext.HttpContext.User;
             string accountName = user.Claims.FirstOrDefault(x => x.Type == "AccountName").Value;
-            if (accountName == Ace.Entity.System.Sys_User.AdminAccountName)
+            if (accountName == Ace.Entity.System.SysUser.AdminAccountName)
                 return true;
 
             List<string> usePermits = null;

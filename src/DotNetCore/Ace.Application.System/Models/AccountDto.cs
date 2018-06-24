@@ -10,6 +10,7 @@ namespace Ace.Application.System
 {
     public class ModifyAccountInfoInput : ValidationModel
     {
+        public string UserId { get; set; }
         public string AccountName { get; set; }
         [Required(ErrorMessage = "姓名不能为空")]
         public string Name { get; set; }

@@ -38,7 +38,6 @@
         $('#Roles').select2({
             placeholder: '-请选择-',
             data: _roles,
-            //data: _orgs,
             allowClear: true,//显示清除按钮
         });
     });
@@ -275,7 +274,6 @@
             var userOrg = userOrgs[i];
             html += c;
 
-            //var title = item
             var className = userOrg.DisablePermission == true ? "fa fa-toggle-off" : "fa fa-toggle-on";
             var title = userOrg.DisablePermission == true ? "点击启用用户部门权限" : "点击禁用用户部门权限";
 

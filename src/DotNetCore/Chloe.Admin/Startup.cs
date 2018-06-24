@@ -54,7 +54,9 @@ namespace Chloe.Admin
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton(this.Configuration);
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddDatabase(this.Configuration);
             services.RegisterAppServices(); /* 注册应用服务 */
 
             /* 缓存 */

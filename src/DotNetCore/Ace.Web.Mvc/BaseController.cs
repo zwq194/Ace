@@ -92,6 +92,10 @@ namespace Ace.Web.Mvc
             }
         }
 
+        protected virtual T CreateService<T>()
+        {
+            return (T)this.HttpContext.RequestServices.GetService(typeof(T));
+        }
 
         [NonAction]
         public ContentResult JsonContent(object obj)

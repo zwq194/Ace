@@ -4,6 +4,7 @@ using Ace.IdStrategy;
 using AutoMapper;
 using Chloe.Descriptors;
 using Chloe.Exceptions;
+using Chloe.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -111,23 +112,23 @@ namespace Chloe
             TEntity entity = AceMapper.Map<TEntity>(dto);
 
             Type entityType = typeof(TEntity);
-            TypeDescriptor typeDescriptor = TypeDescriptor.GetDescriptor(entityType);
+            TypeDescriptor typeDescriptor = EntityTypeContainer.GetDescriptor(entityType);
 
             /* 设置 主键=guid */
             if (typeDescriptor.PrimaryKeys.Count < 2) /* 只有无主键或单一主键的时候 */
             {
-                MappingMemberDescriptor primaryKeyDescriptor = typeDescriptor.PrimaryKeys.FirstOrDefault();
+                var primaryKeyDescriptor = typeDescriptor.PrimaryKeys.FirstOrDefault();
                 if (primaryKeyDescriptor != null && primaryKeyDescriptor.IsAutoIncrement == false)
                 {
                     var keyValue = primaryKeyDescriptor.GetValue(entity);
-                    if (keyValue.IsDefaultValueOfType(primaryKeyDescriptor.MemberInfoType) || string.Empty.Equals(keyValue))
+                    if (keyValue.IsDefaultValueOfType(primaryKeyDescriptor.PropertyType) || string.Empty.Equals(keyValue))
                     {
                         /* 如果未设置主键值，则自动设置为 guid */
-                        if (primaryKeyDescriptor.MemberInfoType == typeof(string))
+                        if (primaryKeyDescriptor.PropertyType == typeof(string))
                         {
                             primaryKeyDescriptor.SetValue(entity, IdHelper.CreateSnowflakeId().ToString());
                         }
-                        else if (primaryKeyDescriptor.MemberInfoType.GetUnderlyingType() == typeof(Guid))
+                        else if (primaryKeyDescriptor.PropertyType.GetUnderlyingType() == typeof(Guid))
                         {
                             primaryKeyDescriptor.SetValue(entity, Guid.NewGuid());
                         }
@@ -164,7 +165,7 @@ namespace Chloe
             Utils.CheckNull(dto);
 
             Type entityType = typeof(TEntity);
-            TypeDescriptor typeDescriptor = TypeDescriptor.GetDescriptor(entityType);
+            TypeDescriptor typeDescriptor = EntityTypeContainer.GetDescriptor(entityType);
 
             if (typeDescriptor.PrimaryKeys.Count != 1)
             {
@@ -180,7 +181,7 @@ namespace Chloe
             ConstantExpression dtoConstantExp = Expression.Constant(dto);
             foreach (PropertyMap propertyMap in propertyMaps)
             {
-                var mappingMemberDescriptor = typeDescriptor.TryGetMappingMemberDescriptor(propertyMap.DestinationProperty);
+                var mappingMemberDescriptor = typeDescriptor.TryGetPropertyDescriptor(propertyMap.DestinationProperty);
 
                 if (mappingMemberDescriptor == null)
                     continue;
@@ -222,20 +223,20 @@ namespace Chloe
             {
                 throw new ArgumentException("未能从 dto 中找到主键或主键为空");
             }
-            
+
             return dbContext.Update<TEntity>(key, bindings);
         }
 
         static void SetValueIfNeeded(object entity, TypeDescriptor typeDescriptor, string propertyName, object valueToSet)
         {
-            PropertyInfo pi = typeDescriptor.EntityType.GetProperty(propertyName);
+            PropertyInfo pi = typeDescriptor.Definition.Type.GetProperty(propertyName);
             if (pi != null && pi.PropertyType.GetUnderlyingType() == valueToSet.GetType())
             {
-                var mappingMemberDescriptor = typeDescriptor.TryGetMappingMemberDescriptor(pi);
+                var mappingMemberDescriptor = typeDescriptor.TryGetPropertyDescriptor(pi);
                 if (mappingMemberDescriptor != null)
                 {
                     var value = mappingMemberDescriptor.GetValue(entity);
-                    if (value.IsDefaultValueOfType(mappingMemberDescriptor.MemberInfoType))
+                    if (value.IsDefaultValueOfType(mappingMemberDescriptor.PropertyType))
                     {
                         mappingMemberDescriptor.SetValue(entity, valueToSet);
                     }
@@ -265,14 +266,14 @@ namespace Chloe
             Utils.CheckNull(key);
 
             Type entityType = typeof(TEntity);
-            TypeDescriptor typeDescriptor = TypeDescriptor.GetDescriptor(entityType);
+            TypeDescriptor typeDescriptor = EntityTypeContainer.GetDescriptor(entityType);
             EnsureEntityHasPrimaryKey(typeDescriptor);
 
             KeyValuePairList<MemberInfo, object> keyValueMap = new KeyValuePairList<MemberInfo, object>();
 
             if (typeDescriptor.PrimaryKeys.Count == 1)
             {
-                keyValueMap.Add(typeDescriptor.PrimaryKeys[0].MemberInfo, key);
+                keyValueMap.Add(typeDescriptor.PrimaryKeys[0].Property, key);
             }
             else
             {
@@ -285,16 +286,16 @@ namespace Chloe
 
                 for (int i = 0; i < typeDescriptor.PrimaryKeys.Count; i++)
                 {
-                    MappingMemberDescriptor keyMemberDescriptor = typeDescriptor.PrimaryKeys[i];
-                    MemberInfo keyMember = multipleKeyObjectType.GetProperty(keyMemberDescriptor.MemberInfo.Name);
+                    var keyMemberDescriptor = typeDescriptor.PrimaryKeys[i];
+                    MemberInfo keyMember = multipleKeyObjectType.GetProperty(keyMemberDescriptor.Property.Name);
                     if (keyMember == null)
-                        throw new ArgumentException(string.Format("The input object does not define property for key '{0}'.", keyMemberDescriptor.MemberInfo.Name));
+                        throw new ArgumentException(string.Format("The input object does not define property for key '{0}'.", keyMemberDescriptor.Property.Name));
 
                     object value = keyMember.GetMemberValue(multipleKeyObject);
                     if (value == null)
-                        throw new ArgumentException(string.Format("The primary key '{0}' could not be null.", keyMemberDescriptor.MemberInfo.Name));
+                        throw new ArgumentException(string.Format("The primary key '{0}' could not be null.", keyMemberDescriptor.Property.Name));
 
-                    keyValueMap.Add(keyMemberDescriptor.MemberInfo, value);
+                    keyValueMap.Add(keyMemberDescriptor.Property, value);
                 }
             }
 
@@ -356,7 +357,7 @@ namespace Chloe
         static void EnsureEntityHasPrimaryKey(TypeDescriptor typeDescriptor)
         {
             if (!typeDescriptor.HasPrimaryKey())
-                throw new ChloeException(string.Format("The entity type '{0}' does not define any primary key.", typeDescriptor.EntityType.FullName));
+                throw new ChloeException(string.Format("The entity type '{0}' does not define any primary key.", typeDescriptor.Definition.Type.FullName));
         }
     }
 }

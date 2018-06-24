@@ -12,7 +12,7 @@ namespace Ace.Application.System
         public string Id { get; set; }
         public string Name { get; set; }
 
-        public static SimpleRoleModel Create(Sys_Role role)
+        public static SimpleRoleModel Create(SysRole role)
         {
             SimpleRoleModel roleModel = new SimpleRoleModel();
 
@@ -41,13 +41,13 @@ namespace Ace.Application.System
         }
     }
 
-    [MapToType(typeof(Sys_Role))]
+    [MapToType(typeof(SysRole))]
     public class AddRoleInput : AddOrUpdateRoleInputBase
     {
-
+        public string CreateUserId { get; set; }
     }
 
-    [MapToType(typeof(Sys_Role))]
+    [MapToType(typeof(SysRole))]
     public class UpdateRoleInput : AddOrUpdateRoleInputBase
     {
         [RequiredAttribute(ErrorMessage = "{0}不能为空")]

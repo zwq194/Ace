@@ -223,7 +223,7 @@ function newGuid() {
         for (var i = 0; i < arr.length; i++) {
             var ar = arr[i].split("=");
             if (ar[0].toLowerCase() == name) {
-                return decodeURI(ar[1]);
+                return decodeURIComponent(ar[1]);
             }
         }
         return "";
@@ -249,7 +249,7 @@ function newGuid() {
             if (!paramName)
                 continue;
             var value = item.substr(index + 1);
-            params[paramName] = decodeURI(value);
+            params[paramName] = decodeURIComponent(value);
         }
         return params;
     }

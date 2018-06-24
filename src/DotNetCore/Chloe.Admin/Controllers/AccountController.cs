@@ -50,7 +50,7 @@ namespace Chloe.Admin.Controllers
             const string moduleName = "系统登录";
             string ip = this.HttpContext.GetClientIP();
 
-            Sys_User user;
+            SysUser user;
             string msg;
             if (!accountAppService.CheckLogin(loginName, password, out user, out msg))
             {
@@ -62,8 +62,6 @@ namespace Chloe.Admin.Controllers
             session.UserId = user.Id;
             session.AccountName = user.AccountName;
             session.Name = user.Name;
-            //session.OrgIds = user.OrgIds;
-            //session.RoleIds = user.RoleIds;
             session.LoginIP = ip;
             session.IsAdmin = user.AccountName.ToLower() == AppConsts.AdminUserName;
 
@@ -98,7 +96,7 @@ namespace Chloe.Admin.Controllers
         public ActionResult Index()
         {
             var service = this.CreateService<IEntityAppService>();
-            Sys_User user = service.GetByKey<Sys_User>(this.CurrentSession.UserId);
+            SysUser user = service.GetByKey<SysUser>(this.CurrentSession.UserId);
             //Sys_Role role = string.IsNullOrEmpty(user.RoleId) ? null : service.GetByKey<Sys_Role>(user.RoleId);
 
             UserModel model = new UserModel();
@@ -121,7 +119,7 @@ namespace Chloe.Admin.Controllers
         [HttpPost]
         public ActionResult ChangePassword(string oldPassword, string newPassword)
         {
-            this.CreateService<IAccountService>().ChangePassword(oldPassword, newPassword);
+            this.CreateService<IAccountService>().ChangePassword(this.CurrentSession.UserId, oldPassword, newPassword);
             return this.SuccessMsg("密码修改成功");
         }
 
@@ -137,6 +135,6 @@ namespace Chloe.Admin.Controllers
 
     public class UserModel
     {
-        public Sys_User User { get; set; }
+        public SysUser User { get; set; }
     }
 }

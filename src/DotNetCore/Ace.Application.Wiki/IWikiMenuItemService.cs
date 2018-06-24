@@ -20,8 +20,12 @@ namespace Ace.Application.Wiki
         void Delete(string id);
     }
 
-    public class WikiMenuItemService : AdminAppService, IWikiMenuItemService
+    public class WikiMenuItemService : AppServiceBase, IWikiMenuItemService
     {
+        public WikiMenuItemService(IDbContext dbContext, IServiceProvider services) : base(dbContext, services)
+        {
+        }
+
         public List<WikiMenuItem> GetWikiMenuItems()
         {
             List<WikiMenuItem> menuItems = this.DbContext.Query<WikiMenuItem>().ToList();

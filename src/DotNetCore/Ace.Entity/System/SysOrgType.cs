@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Chloe.Annotations;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Ace.Entity.System
 {
-    public class Sys_OrgType
+    [Table("Sys_OrgType")]
+    public class SysOrgType
     {
         public int Id { get; set; }
         public string Name { get; set; }

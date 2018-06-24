@@ -22,11 +22,11 @@ namespace Ace.Application.System
         public int? SortCode { get; set; }
     }
 
-    [MapToType(typeof(Sys_Permission))]
+    [MapToType(typeof(SysPermission))]
     public class AddPermissionInput : AddOrUpdatePermissionInputBase
     {
     }
-    [MapToType(typeof(Sys_Permission))]
+    [MapToType(typeof(SysPermission))]
     public class UpdatePermissionInput : AddOrUpdatePermissionInputBase
     {
         public string Id { get; set; }

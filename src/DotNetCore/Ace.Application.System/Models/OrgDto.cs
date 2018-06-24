@@ -16,12 +16,12 @@ namespace Ace.Application.System
         public string Description { get; set; }
     }
 
-    [MapToType(typeof(Sys_Org))]
+    [MapToType(typeof(SysOrg))]
     public class AddOrgInput : OrgInputBase
     {
     }
 
-    [MapToType(typeof(Sys_Org))]
+    [MapToType(typeof(SysOrg))]
     public class UpdateOrgInput : OrgInputBase
     {
         [RequiredAttribute(ErrorMessage = "{0}不能为空")]

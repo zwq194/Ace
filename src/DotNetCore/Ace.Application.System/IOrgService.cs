@@ -14,20 +14,24 @@ namespace Ace.Application.System
 {
     public interface IOrgService : IAppService
     {
-        List<Sys_Org> GetList(string keyword = "");
+        List<SysOrg> GetList(string keyword = "");
         void Add(AddOrgInput input);
         void Update(UpdateOrgInput input);
-        void Delete(string id);
-        List<Sys_OrgPermission> GetPermissions(string orgId);
+        void Delete(string id, string operatorId);
+        List<SysOrgPermission> GetPermissions(string orgId);
         void SetPermission(string orgId, List<string> permissionList);
-        List<Sys_Org> GetParentOrgs(int orgType);
-        List<Sys_OrgType> GetOrgTypes();
-        List<Sys_Org> GetListById(List<string> ids);
+        List<SysOrg> GetParentOrgs(int orgType);
+        List<SysOrgType> GetOrgTypes();
+        List<SysOrg> GetListById(List<string> ids);
     }
 
-    public class OrgService : AdminAppService<Sys_Org>, IOrgService
+    public class OrgService : AppServiceBase<SysOrg>, IOrgService
     {
-        public List<Sys_Org> GetList(string keyword = "")
+        public OrgService(IDbContext dbContext, IServiceProvider services) : base(dbContext, services)
+        {
+        }
+
+        public List<SysOrg> GetList(string keyword = "")
         {
             var q = this.Query.FilterDeleted();
             if (keyword.IsNotNullOrEmpty())
@@ -47,20 +51,20 @@ namespace Ace.Application.System
             this.UpdateFromDto(input);
         }
 
-        public void Delete(string id)
+        public void Delete(string id, string operatorId)
         {
-            this.SoftDelete(id);
+            this.SoftDelete(id, operatorId);
         }
 
-        public List<Sys_OrgPermission> GetPermissions(string orgId)
+        public List<SysOrgPermission> GetPermissions(string orgId)
         {
-            return this.DbContext.Query<Sys_OrgPermission>().Where(t => t.OrgId == orgId).ToList();
+            return this.DbContext.Query<SysOrgPermission>().Where(t => t.OrgId == orgId).ToList();
         }
         public void SetPermission(string orgId, List<string> permissionList)
         {
             orgId.NotNullOrEmpty();
 
-            List<Sys_OrgPermission> roleAuths = permissionList.Select(a => new Sys_OrgPermission()
+            List<SysOrgPermission> roleAuths = permissionList.Select(a => new SysOrgPermission()
             {
                 Id = IdHelper.CreateStringSnowflakeId(),
                 OrgId = orgId,
@@ -69,26 +73,26 @@ namespace Ace.Application.System
 
             this.DbContext.DoWithTransaction(() =>
             {
-                this.DbContext.Delete<Sys_OrgPermission>(a => a.OrgId == orgId);
+                this.DbContext.Delete<SysOrgPermission>(a => a.OrgId == orgId);
                 this.DbContext.InsertRange(roleAuths);
             });
         }
-        public List<Sys_Org> GetParentOrgs(int orgType)
+        public List<SysOrg> GetParentOrgs(int orgType)
         {
-            var orgTypeQuery = this.DbContext.Query<Sys_OrgType>().Where(a => a.Id == orgType);
+            var orgTypeQuery = this.DbContext.Query<SysOrgType>().Where(a => a.Id == orgType);
             var q = this.Query.Where(a => Sql.Equals(a.OrgType, orgTypeQuery.First().ParentId));
-            List<Sys_Org> ret = q.ToList();
+            List<SysOrg> ret = q.ToList();
 
             return ret;
         }
-        public List<Sys_OrgType> GetOrgTypes()
+        public List<SysOrgType> GetOrgTypes()
         {
-            return this.DbContext.Query<Sys_OrgType>().ToList();
+            return this.DbContext.Query<SysOrgType>().ToList();
         }
-        public List<Sys_Org> GetListById(List<string> ids)
+        public List<SysOrg> GetListById(List<string> ids)
         {
             if (ids.Count == 0)
-                return new List<Sys_Org>();
+                return new List<SysOrg>();
 
             return this.Query.FilterDeleted().Where(a => ids.Contains(a.Id)).ToList();
         }

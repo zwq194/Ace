@@ -29,22 +29,26 @@ namespace Ace.Application.System
         void ChangeState(string id, AccountState newState);
         void ChangeUserOrgPermissionState(string userId, string orgId, bool newState);
 
-        List<Sys_UserPermission> GetPermissions(string id);
+        List<SysUserPermission> GetPermissions(string id);
         void SetPermission(string id, List<string> permissionList);
-        PagedData<Sys_User> GetPageData(Pagination page, string keyword);
+        PagedData<SysUser> GetPageData(Pagination page, string keyword);
 
-        List<Sys_Permission> GetUserPermissions(string id);
+        List<SysPermission> GetUserPermissions(string id);
         List<string> GetUserPermits(string id);
     }
 
-    public class UserService : AdminAppService<Sys_User>, IUserService
+    public class UserService : AppServiceBase<SysUser>, IUserService
     {
+        public UserService(IDbContext dbContext, IServiceProvider services) : base(dbContext, services)
+        {
+        }
+
         public void RevisePassword(string userId, string pwdText)
         {
             userId.NotNullOrEmpty("用户 Id 不能为空");
             PasswordHelper.EnsurePasswordLegal(pwdText);
 
-            var user = this.DbContext.QueryByKey<Sys_User>(userId);
+            var user = this.DbContext.QueryByKey<SysUser>(userId);
             if (user == null)
                 throw new InvalidInputException("用户不存在");
             if (user.State == AccountState.Closed)
@@ -57,8 +61,7 @@ namespace Ace.Application.System
 
             this.DbContext.DoWithTransaction(() =>
             {
-                this.DbContext.Update<Sys_UserLogOn>(a => a.UserId == userId, a => new Sys_UserLogOn() { UserSecretkey = userSecretkey, UserPassword = encryptedPassword });
-                this.Log(LogType.Update, "User", true, "重置用户[{0}]密码".ToFormat(userId));
+                this.DbContext.Update<SysUserLogOn>(a => a.UserId == userId, a => new SysUserLogOn() { UserSecretkey = userSecretkey, UserPassword = encryptedPassword });
             });
         }
 
@@ -78,7 +81,7 @@ namespace Ace.Application.System
             {
                 accountName = input.AccountName.ToLower();
                 AceUtils.EnsureAccountNameLegal(accountName);
-                bool exists = this.DbContext.Query<Sys_User>().Where(a => a.AccountName == accountName).Any();
+                bool exists = this.DbContext.Query<SysUser>().Where(a => a.AccountName == accountName).Any();
                 if (exists)
                     throw new InvalidInputException("用户名[{0}]已存在".ToFormat(input.AccountName));
             }
@@ -90,7 +93,7 @@ namespace Ace.Application.System
                 if (AceUtils.IsMobilePhone(mobilePhone) == false)
                     throw new InvalidInputException("请输入正确的手机号码");
 
-                bool exists = this.DbContext.Query<Sys_User>().Where(a => a.MobilePhone == mobilePhone).Any();
+                bool exists = this.DbContext.Query<SysUser>().Where(a => a.MobilePhone == mobilePhone).Any();
                 if (exists)
                     throw new InvalidInputException("手机号码[{0}]已存在".ToFormat(mobilePhone));
             }
@@ -102,12 +105,12 @@ namespace Ace.Application.System
                 if (AceUtils.IsEmail(email) == false)
                     throw new InvalidInputException("请输入正确的邮箱地址");
 
-                bool exists = this.DbContext.Query<Sys_User>().Where(a => a.Email == email).Any();
+                bool exists = this.DbContext.Query<SysUser>().Where(a => a.Email == email).Any();
                 if (exists)
                     throw new InvalidInputException("邮箱地址[{0}]已存在".ToFormat(input.Email));
             }
 
-            Sys_User user = this.CreateEntity<Sys_User>();
+            SysUser user = this.CreateEntity<SysUser>(null, input.CreatorId);
             user.AccountName = accountName;
             user.Name = input.Name;
             user.Gender = input.Gender;
@@ -121,16 +124,16 @@ namespace Ace.Application.System
             string userSecretkey = UserHelper.GenUserSecretkey();
             string encryptedPassword = PasswordHelper.Encrypt(input.Password, userSecretkey);
 
-            Sys_UserLogOn logOnEntity = new Sys_UserLogOn();
+            SysUserLogOn logOnEntity = new SysUserLogOn();
             logOnEntity.Id = IdHelper.CreateStringSnowflakeId();
             logOnEntity.UserId = user.Id;
             logOnEntity.UserSecretkey = userSecretkey;
             logOnEntity.UserPassword = encryptedPassword;
 
             List<string> roleIds = input.GetRoles();
-            List<Sys_UserRole> userRoles = roleIds.Select(a =>
+            List<SysUserRole> userRoles = roleIds.Select(a =>
              {
-                 return new Sys_UserRole()
+                 return new SysUserRole()
                  {
                      Id = IdHelper.CreateStringSnowflakeId(),
                      UserId = user.Id,
@@ -141,9 +144,9 @@ namespace Ace.Application.System
             user.RoleIds = string.Join(",", roleIds);
 
             List<string> orgIds = input.GetOrgs();
-            List<Sys_UserOrg> userOrgs = orgIds.Select(a =>
+            List<SysUserOrg> userOrgs = orgIds.Select(a =>
             {
-                return new Sys_UserOrg()
+                return new SysUserOrg()
                 {
                     Id = IdHelper.CreateStringSnowflakeId(),
                     UserId = user.Id,
@@ -155,9 +158,9 @@ namespace Ace.Application.System
             user.OrgIds = string.Join(",", orgIds);
 
             List<string> postIds = input.GetPosts();
-            List<Sys_UserPost> userPosts = postIds.Select(a =>
+            List<SysUserPost> userPosts = postIds.Select(a =>
             {
-                return new Sys_UserPost()
+                return new SysUserPost()
                 {
                     Id = IdHelper.CreateStringSnowflakeId(),
                     UserId = user.Id,
@@ -182,7 +185,7 @@ namespace Ace.Application.System
 
             input.Validate();
 
-            Sys_User user = this.Query.Where(a => a.Id == input.Id).AsTracking().First();
+            SysUser user = this.Query.Where(a => a.Id == input.Id).AsTracking().First();
 
             user.EnsureIsNotAdmin();
             if (user.State == AccountState.Closed)
@@ -196,7 +199,7 @@ namespace Ace.Application.System
                 {
                     accountName = input.AccountName.ToLower();
                     AceUtils.EnsureAccountNameLegal(accountName);
-                    bool exists = this.DbContext.Query<Sys_User>().Where(a => a.AccountName == accountName).Any();
+                    bool exists = this.DbContext.Query<SysUser>().Where(a => a.AccountName == accountName).Any();
                     if (exists)
                         throw new InvalidInputException("用户名[{0}]已存在".ToFormat(input.AccountName));
                 }
@@ -218,7 +221,7 @@ namespace Ace.Application.System
 
                 if (user.MobilePhone != mobilePhone)//不等说明手机号码有变
                 {
-                    bool exists = this.DbContext.Query<Sys_User>().Where(a => a.MobilePhone == mobilePhone).Any();
+                    bool exists = this.DbContext.Query<SysUser>().Where(a => a.MobilePhone == mobilePhone).Any();
                     if (exists)
                         throw new InvalidInputException("手机号码[{0}]已存在".ToFormat(mobilePhone));
                 }
@@ -238,7 +241,7 @@ namespace Ace.Application.System
 
                 if (user.Email != email)//不等说明邮箱有变
                 {
-                    bool exists = this.DbContext.Query<Sys_User>().Where(a => a.Email == email).Any();
+                    bool exists = this.DbContext.Query<SysUser>().Where(a => a.Email == email).Any();
                     if (exists)
                         throw new InvalidInputException("邮箱地址[{0}]已存在".ToFormat(input.Email));
                 }
@@ -254,11 +257,11 @@ namespace Ace.Application.System
             user.Description = input.Description;
 
             List<string> roleIds = input.GetRoles();
-            List<Sys_UserRole> userRoles = this.DbContext.Query<Sys_UserRole>().Where(a => a.UserId == input.Id).ToList();
+            List<SysUserRole> userRoles = this.DbContext.Query<SysUserRole>().Where(a => a.UserId == input.Id).ToList();
             List<string> userRolesToDelete = userRoles.Where(a => !roleIds.Contains(a.Id)).Select(a => a.Id).ToList();
-            List<Sys_UserRole> userRolesToAdd = roleIds.Where(a => !userRoles.Any(r => r.Id == a)).Select(a =>
+            List<SysUserRole> userRolesToAdd = roleIds.Where(a => !userRoles.Any(r => r.Id == a)).Select(a =>
             {
-                return new Sys_UserRole()
+                return new SysUserRole()
                 {
                     Id = IdHelper.CreateStringSnowflakeId(),
                     UserId = input.Id,
@@ -269,11 +272,11 @@ namespace Ace.Application.System
             user.RoleIds = string.Join(",", roleIds);
 
             List<string> orgIds = input.GetOrgs();
-            List<Sys_UserOrg> userOrgs = this.DbContext.Query<Sys_UserOrg>().Where(a => a.UserId == input.Id).ToList();
+            List<SysUserOrg> userOrgs = this.DbContext.Query<SysUserOrg>().Where(a => a.UserId == input.Id).ToList();
             List<string> userOrgsToDelete = userOrgs.Where(a => !orgIds.Contains(a.Id)).Select(a => a.Id).ToList();
-            List<Sys_UserOrg> userOrgsToAdd = orgIds.Where(a => !userOrgs.Any(r => r.Id == a)).Select(a =>
+            List<SysUserOrg> userOrgsToAdd = orgIds.Where(a => !userOrgs.Any(r => r.Id == a)).Select(a =>
             {
-                return new Sys_UserOrg()
+                return new SysUserOrg()
                 {
                     Id = IdHelper.CreateStringSnowflakeId(),
                     UserId = input.Id,
@@ -285,9 +288,9 @@ namespace Ace.Application.System
             user.OrgIds = string.Join(",", orgIds);
 
             List<string> postIds = input.GetPosts();
-            List<Sys_UserPost> userPosts = postIds.Select(a =>
+            List<SysUserPost> userPosts = postIds.Select(a =>
             {
-                return new Sys_UserPost()
+                return new SysUserPost()
                 {
                     Id = IdHelper.CreateStringSnowflakeId(),
                     UserId = input.Id,
@@ -299,16 +302,16 @@ namespace Ace.Application.System
 
             this.DbContext.DoWithTransaction(() =>
             {
-                this.DbContext.Delete<Sys_UserRole>(a => a.Id.In(userRolesToDelete));
+                this.DbContext.Delete<SysUserRole>(a => a.Id.In(userRolesToDelete));
                 this.DbContext.InsertRange(userRolesToAdd);
 
-                this.DbContext.Delete<Sys_UserOrg>(a => a.Id.In(userOrgsToDelete));
+                this.DbContext.Delete<SysUserOrg>(a => a.Id.In(userOrgsToDelete));
                 this.DbContext.InsertRange(userOrgsToAdd);
 
-                this.DbContext.Delete<Sys_UserPost>(a => a.UserId == input.Id);
+                this.DbContext.Delete<SysUserPost>(a => a.UserId == input.Id);
                 this.DbContext.InsertRange(userPosts);
 
-                this.DbContext.Update<Sys_User>(user);
+                this.DbContext.Update<SysUser>(user);
             });
         }
         void Trim(AddUpdateUserInputBase input)
@@ -324,7 +327,7 @@ namespace Ace.Application.System
         public void ChangeState(string id, AccountState newState)
         {
             id.NotNullOrEmpty();
-            Sys_User user = this.Query.Where(a => a.Id == id).AsTracking().FirstOrDefault();
+            SysUser user = this.Query.Where(a => a.Id == id).AsTracking().FirstOrDefault();
             user.EnsureIsNotAdmin();
             if (user == null)
                 throw new InvalidInputException("用户不存在");
@@ -340,7 +343,7 @@ namespace Ace.Application.System
             this.DbContext.DoWithTransaction(() =>
             {
                 this.DbContext.Update(user);
-                this.Log(LogType.Update, "User", true, $"用户[{this.Session.UserId}]修改用户[{id}]状态为：{newState}");
+                //this.Log(LogType.Update, "User", true, $"用户[{this.Session.UserId}]修改用户[{id}]状态为：{newState}");
             });
         }
         public void ChangeUserOrgPermissionState(string userId, string orgId, bool newState)
@@ -348,18 +351,18 @@ namespace Ace.Application.System
             userId.NotNullOrEmpty();
             orgId.NotNullOrEmpty();
 
-            this.DbContext.Update<Sys_UserOrg>(a => a.UserId == userId && a.OrgId == orgId, a => new Sys_UserOrg() { DisablePermission = newState });
+            this.DbContext.Update<SysUserOrg>(a => a.UserId == userId && a.OrgId == orgId, a => new SysUserOrg() { DisablePermission = newState });
         }
 
-        public List<Sys_UserPermission> GetPermissions(string id)
+        public List<SysUserPermission> GetPermissions(string id)
         {
-            return this.DbContext.Query<Sys_UserPermission>().Where(t => t.UserId == id).ToList();
+            return this.DbContext.Query<SysUserPermission>().Where(t => t.UserId == id).ToList();
         }
         public void SetPermission(string id, List<string> permissionList)
         {
             id.NotNullOrEmpty();
 
-            List<Sys_UserPermission> rolePermissions = permissionList.Select(a => new Sys_UserPermission()
+            List<SysUserPermission> rolePermissions = permissionList.Select(a => new SysUserPermission()
             {
                 Id = IdHelper.CreateStringSnowflakeId(),
                 UserId = id,
@@ -368,32 +371,32 @@ namespace Ace.Application.System
 
             this.DbContext.DoWithTransaction(() =>
             {
-                this.DbContext.Delete<Sys_UserPermission>(a => a.UserId == id);
+                this.DbContext.Delete<SysUserPermission>(a => a.UserId == id);
                 this.DbContext.InsertRange(rolePermissions);
             });
         }
-        public PagedData<Sys_User> GetPageData(Pagination page, string keyword)
+        public PagedData<SysUser> GetPageData(Pagination page, string keyword)
         {
-            var q = this.DbContext.Query<Sys_User>();
+            var q = this.DbContext.Query<SysUser>();
 
             q = q.WhereIfNotNullOrEmpty(keyword, a => a.AccountName.Contains(keyword) || a.Name.Contains(keyword) || a.MobilePhone.Contains(keyword));
             q = q.Where(a => a.AccountName != AppConsts.AdminUserName);
             q = q.OrderByDesc(a => a.CreationTime);
 
-            PagedData<Sys_User> pagedData = q.TakePageData(page);
+            PagedData<SysUser> pagedData = q.TakePageData(page);
 
             List<string> userIds = pagedData.Models.Select(a => a.Id).ToList();
             List<string> postIds = pagedData.Models.SelectMany(a => a.PostIds.SplitString()).Distinct().ToList();
             List<string> roleIds = pagedData.Models.SelectMany(a => a.RoleIds.SplitString()).Distinct().ToList();
 
-            List<Sys_Post> posts = this.DbContext.Query<Sys_Post>().Where(a => a.Id.In(postIds)).ToList();
-            List<Sys_Role> roles = this.DbContext.Query<Sys_Role>().Where(a => a.Id.In(roleIds)).ToList();
+            List<SysPost> posts = this.DbContext.Query<SysPost>().Where(a => a.Id.In(postIds)).ToList();
+            List<SysRole> roles = this.DbContext.Query<SysRole>().Where(a => a.Id.In(roleIds)).ToList();
 
-            List<Sys_UserOrg> userOrgs = this.DbContext.Query<Sys_UserOrg>().InnerJoin<Sys_Org>((a, b) => a.OrgId == b.Id)
+            List<SysUserOrg> userOrgs = this.DbContext.Query<SysUserOrg>().InnerJoin<SysOrg>((a, b) => a.OrgId == b.Id)
                     .Where((a, b) => userIds.Contains(a.UserId))
-                    .Select((a, b) => new Sys_UserOrg() { Id = a.Id, UserId = a.UserId, OrgId = a.OrgId, DisablePermission = a.DisablePermission, Org = b }).ToList();
+                    .Select((a, b) => new SysUserOrg() { Id = a.Id, UserId = a.UserId, OrgId = a.OrgId, DisablePermission = a.DisablePermission, Org = b }).ToList();
 
-            foreach (Sys_User user in pagedData.Models)
+            foreach (SysUser user in pagedData.Models)
             {
                 user.UserOrgs.AddRange(userOrgs.Where(a => a.UserId == user.Id));
 
@@ -407,20 +410,20 @@ namespace Ace.Application.System
             return pagedData;
         }
 
-        public List<Sys_Permission> GetUserPermissions(string id)
+        public List<SysPermission> GetUserPermissions(string id)
         {
-            List<Sys_Permission> ret = new List<Sys_Permission>();
+            List<SysPermission> ret = new List<SysPermission>();
 
-            List<string> userPermissionIds = this.DbContext.Query<Sys_UserPermission>().Where(a => a.UserId == id).Select(a => a.PermissionId).ToList();
+            List<string> userPermissionIds = this.DbContext.Query<SysUserPermission>().Where(a => a.UserId == id).Select(a => a.PermissionId).ToList();
 
-            List<string> rolePermissionIds = this.DbContext.JoinQuery<Sys_RolePermission, Sys_Role, Sys_UserRole>((rolePermission, role, userRole) => new object[] {
+            List<string> rolePermissionIds = this.DbContext.JoinQuery<SysRolePermission, SysRole, SysUserRole>((rolePermission, role, userRole) => new object[] {
                 JoinType.InnerJoin,rolePermission.RoleId==role.Id,
                 JoinType.InnerJoin,role.Id==userRole.RoleId
             })
             .Where((rolePermission, role, userRole) => userRole.UserId == id)
             .Select((rolePermission, role, userRole) => rolePermission.PermissionId).ToList();
 
-            List<string> orgPermissionIds = this.DbContext.JoinQuery<Sys_OrgPermission, Sys_Org, Sys_UserOrg>((orgPermission, org, userOrg) => new object[] {
+            List<string> orgPermissionIds = this.DbContext.JoinQuery<SysOrgPermission, SysOrg, SysUserOrg>((orgPermission, org, userOrg) => new object[] {
                 JoinType.InnerJoin,orgPermission.OrgId==org.Id,
                 JoinType.InnerJoin,org.Id==userOrg.OrgId
             })
@@ -429,7 +432,7 @@ namespace Ace.Application.System
 
             List<string> permissionIds = userPermissionIds.Concat(rolePermissionIds).Concat(orgPermissionIds).Distinct().ToList();
 
-            ret = this.DbContext.Query<Sys_Permission>().Where(a => permissionIds.Contains(a.Id)).ToList();
+            ret = this.DbContext.Query<SysPermission>().Where(a => permissionIds.Contains(a.Id)).ToList();
 
             return ret;
         }

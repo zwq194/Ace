@@ -35,18 +35,6 @@ namespace Chloe.Admin.Common
 
     public abstract class WebController : BaseController
     {
-        [Disposable]
-        AppServiceFactory _appServicesFactory;
-        IAppServiceFactory AppServicesFactory
-        {
-            get
-            {
-                if (this._appServicesFactory == null)
-                    this._appServicesFactory = new AppServiceFactory(this.HttpContext.RequestServices, this.CurrentSession);
-                return this._appServicesFactory;
-            }
-        }
-
         [NonAction]
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
@@ -110,18 +98,8 @@ namespace Chloe.Admin.Common
                 //    AllowRefresh = false
                 //});
 
-                if (this._appServicesFactory != null)
-                {
-                    this._appServicesFactory.Session = session;
-                }
-
                 this._session = session;
             }
-        }
-
-        protected T CreateService<T>()
-        {
-            return this.AppServicesFactory.CreateService<T>();
         }
     }
 }

@@ -14,22 +14,26 @@ namespace Ace.Application.System
 {
     public interface IRoleService : IAppService
     {
-        List<Sys_Role> GetRoles(string keyword = "");
+        List<SysRole> GetRoles(string keyword = "");
         List<SimpleRoleModel> GetSimpleModels();
         void Add(AddRoleInput input);
         void Update(UpdateRoleInput input);
-        void Delete(string roleId);
+        void Delete(string roleId, string operatorId);
 
-        List<Sys_Role> GetList(string keyword = "");
-        List<Sys_RolePermission> GetPermissions(string id);
+        List<SysRole> GetList(string keyword = "");
+        List<SysRolePermission> GetPermissions(string id);
         void SetPermission(string id, List<string> permissionList);
     }
 
-    public class RoleService : AdminAppService, IRoleService
+    public class RoleService : AppServiceBase, IRoleService
     {
-        public List<Sys_Role> GetRoles(string keyword = "")
+        public RoleService(IDbContext dbContext, IServiceProvider services) : base(dbContext, services)
         {
-            var q = this.DbContext.Query<Sys_Role>().FilterDeleted();
+        }
+
+        public List<SysRole> GetRoles(string keyword = "")
+        {
+            var q = this.DbContext.Query<SysRole>().FilterDeleted();
             if (keyword.IsNotNullOrEmpty())
             {
                 q = q.Where(a => a.Name.Contains(keyword));
@@ -40,14 +44,14 @@ namespace Ace.Application.System
         }
         public List<SimpleRoleModel> GetSimpleModels()
         {
-            var q = this.DbContext.Query<Sys_Role>().FilterDeletedAndDisabled().OrderBy(a => a.SortCode);
+            var q = this.DbContext.Query<SysRole>().FilterDeletedAndDisabled().OrderBy(a => a.SortCode);
             var ret = q.Select(a => new SimpleRoleModel() { Id = a.Id, Name = a.Name }).ToList();
             return ret;
         }
         public void Add(AddRoleInput input)
         {
             input.Validate();
-            Sys_Role role = this.CreateEntity<Sys_Role>();
+            SysRole role = this.CreateEntity<SysRole>(null, input.CreateUserId);
 
             AceMapper.Map(input, role);
             this.DbContext.DoWithTransaction(() =>
@@ -59,7 +63,7 @@ namespace Ace.Application.System
         {
             input.Validate();
 
-            Sys_Role role = this.DbContext.QueryByKey<Sys_Role>(input.Id, true);
+            SysRole role = this.DbContext.QueryByKey<SysRole>(input.Id, true);
 
             role.NotNull("角色不存在");
 
@@ -71,29 +75,28 @@ namespace Ace.Application.System
             });
         }
 
-        public void Delete(string id)
+        public void Delete(string id, string operatorId)
         {
-            id.NotNullOrEmpty();
-            this.SoftDelete<Sys_Role>(id);
+            this.SoftDelete<SysRole>(id, operatorId);
         }
 
 
-        public List<Sys_Role> GetList(string keyword = "")
+        public List<SysRole> GetList(string keyword = "")
         {
-            var q = this.DbContext.Query<Sys_Role>().FilterDeleted();
+            var q = this.DbContext.Query<SysRole>().FilterDeleted();
             q = q.Where(a => a.Name.Contains(keyword));
             var ret = q.OrderBy(a => a.SortCode).ToList();
             return ret;
         }
-        public List<Sys_RolePermission> GetPermissions(string id)
+        public List<SysRolePermission> GetPermissions(string id)
         {
-            return this.DbContext.Query<Sys_RolePermission>().Where(t => t.RoleId == id).ToList();
+            return this.DbContext.Query<SysRolePermission>().Where(t => t.RoleId == id).ToList();
         }
         public void SetPermission(string id, List<string> permissionList)
         {
             id.NotNullOrEmpty();
 
-            List<Sys_RolePermission> roleAuths = permissionList.Select(a => new Sys_RolePermission()
+            List<SysRolePermission> roleAuths = permissionList.Select(a => new SysRolePermission()
             {
                 Id = IdHelper.CreateStringSnowflakeId(),
                 RoleId = id,
@@ -102,7 +105,7 @@ namespace Ace.Application.System
 
             this.DbContext.DoWithTransaction(() =>
             {
-                this.DbContext.Delete<Sys_RolePermission>(a => a.RoleId == id);
+                this.DbContext.Delete<SysRolePermission>(a => a.RoleId == id);
                 this.DbContext.InsertRange(roleAuths);
             });
         }

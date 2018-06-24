@@ -36,6 +36,7 @@ namespace Ace.Application.System
 
     public class AddUserInput : AddUpdateUserInputBase
     {
+        public string CreatorId { get; set; }
         /// <summary>
         /// 创建用户时，传的是明文
         /// </summary>

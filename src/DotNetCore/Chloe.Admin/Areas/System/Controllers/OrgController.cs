@@ -20,7 +20,7 @@ namespace Chloe.Admin.Areas.System.Controllers
     {
         public ActionResult Index()
         {
-            List<Sys_OrgType> orgTypes = this.CreateService<IEntityAppService>().GetList<Sys_OrgType>();
+            List<SysOrgType> orgTypes = this.CreateService<IEntityAppService>().GetList<SysOrgType>();
             this.ViewBag.OrgTypes = orgTypes;
             return View();
         }
@@ -28,7 +28,7 @@ namespace Chloe.Admin.Areas.System.Controllers
         [HttpGet]
         public ActionResult Models(string keyword)
         {
-            List<Sys_Org> data = this.Service.GetList(keyword);
+            List<SysOrg> data = this.Service.GetList(keyword);
             if (!string.IsNullOrWhiteSpace(keyword))
             {
                 string lowerKeyword = keyword.ToLower().Trim();
@@ -61,20 +61,20 @@ namespace Chloe.Admin.Areas.System.Controllers
         [HttpPost]
         public ActionResult Delete(string id)
         {
-            this.Service.Delete(id);
+            this.Service.Delete(id, this.CurrentSession.UserId);
             return this.DeleteSuccessMsg();
         }
 
         public ActionResult GetPermissionTree(string id)
         {
-            List<Sys_Permission> authList = this.CreateService<IPermissionService>().GetList();
-            List<Sys_OrgPermission> authorizedata = new List<Sys_OrgPermission>();
+            List<SysPermission> authList = this.CreateService<IPermissionService>().GetList();
+            List<SysOrgPermission> authorizedata = new List<SysOrgPermission>();
             if (!string.IsNullOrEmpty(id))
             {
                 authorizedata = this.Service.GetPermissions(id);
             }
             var treeList = new List<TreeViewModel>();
-            foreach (Sys_Permission auth in authList.Where(a => a.Type != PermissionType.公共菜单))
+            foreach (SysPermission auth in authList.Where(a => a.Type != PermissionType.公共菜单))
             {
                 string typeName = "";
                 if (auth.Type == PermissionType.权限菜单)
@@ -109,7 +109,7 @@ namespace Chloe.Admin.Areas.System.Controllers
 
         public ActionResult GetParentOrgs(int? orgType)
         {
-            List<Sys_Org> orgs = new List<Sys_Org>();
+            List<SysOrg> orgs = new List<SysOrg>();
             if (orgType == null)
                 return this.SuccessData(orgs);
 

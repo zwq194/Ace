@@ -13,16 +13,20 @@ namespace Ace.Application.System
 {
     public interface IPostService : IAppService
     {
-        List<Sys_Post> GetList(string keyword = "");
+        List<SysPost> GetList(string keyword = "");
         void Add(AddPostInput input);
         void Update(UpdatePostInput input);
-        void Delete(string id);
-        List<Sys_Post> GetListByOrgId(List<string> orgIds);
+        void Delete(string id, string operatorId);
+        List<SysPost> GetListByOrgId(List<string> orgIds);
     }
 
-    public class PostService : AdminAppService<Sys_Post>, IPostService
+    public class PostService : AppServiceBase<SysPost>, IPostService
     {
-        public List<Sys_Post> GetList(string keyword = "")
+        public PostService(IDbContext dbContext, IServiceProvider services) : base(dbContext, services)
+        {
+        }
+
+        public List<SysPost> GetList(string keyword = "")
         {
             var q = this.Query.FilterDeleted();
             if (keyword.IsNotNullOrEmpty())
@@ -42,15 +46,15 @@ namespace Ace.Application.System
             this.UpdateFromDto(input);
         }
 
-        public void Delete(string id)
+        public void Delete(string id, string operatorId)
         {
-            this.SoftDelete(id);
+            this.SoftDelete(id, operatorId);
         }
 
-        public List<Sys_Post> GetListByOrgId(List<string> orgIds)
+        public List<SysPost> GetListByOrgId(List<string> orgIds)
         {
             if (orgIds.Count == 0)
-                return new List<Sys_Post>();
+                return new List<SysPost>();
 
             return this.Query.FilterDeleted().Where(a => orgIds.Contains(a.OrgId)).ToList();
         }

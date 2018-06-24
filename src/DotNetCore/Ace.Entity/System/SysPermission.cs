@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Chloe.Annotations;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -23,7 +24,9 @@ namespace Ace.Entity.System
         /// </summary>
         节点组 = 4,
     }
-    public class Sys_Permission
+
+    [Table("Sys_Permission")]
+    public class SysPermission
     {
         public string Id { get; set; }
         public string Name { get; set; }
@@ -38,7 +41,7 @@ namespace Ace.Entity.System
         public string Description { get; set; }
         public int? SortCode { get; set; }
 
-        public List<Sys_Permission> Children { get; set; } = new List<Sys_Permission>();
+        public List<SysPermission> Children { get; set; } = new List<SysPermission>();
 
         public int GetSortCode(int nullIf = 999)
         {

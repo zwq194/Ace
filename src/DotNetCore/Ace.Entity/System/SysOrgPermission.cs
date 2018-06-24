@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Chloe.Annotations;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Ace.Entity.System
 {
-    public class Sys_OrgPermission
+    [Table("Sys_OrgPermission")]
+    public class SysOrgPermission
     {
         public string Id { get; set; }
         public string OrgId { get; set; }

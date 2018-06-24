@@ -1,4 +1,5 @@
 ﻿using Chloe.Infrastructure.Interception;
+using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -12,8 +13,12 @@ namespace Ace.Data
         public void ReaderExecuting(IDbCommand command, DbCommandInterceptionContext<IDataReader> interceptionContext)
         {
             //interceptionContext.DataBag.Add("startTime", DateTime.Now);
+            AmendParameter(command);
+
+#if DEBUG
             Debug.WriteLine(AppendDbCommandInfo(command));
             Console.WriteLine(command.CommandText);
+#endif
         }
         public void ReaderExecuted(IDbCommand command, DbCommandInterceptionContext<IDataReader> interceptionContext)
         {
@@ -25,8 +30,12 @@ namespace Ace.Data
 
         public void NonQueryExecuting(IDbCommand command, DbCommandInterceptionContext<int> interceptionContext)
         {
+            AmendParameter(command);
+
+#if DEBUG
             Debug.WriteLine(AppendDbCommandInfo(command));
             Console.WriteLine(command.CommandText);
+#endif
         }
         public void NonQueryExecuted(IDbCommand command, DbCommandInterceptionContext<int> interceptionContext)
         {
@@ -37,8 +46,12 @@ namespace Ace.Data
         public void ScalarExecuting(IDbCommand command, DbCommandInterceptionContext<object> interceptionContext)
         {
             //interceptionContext.DataBag.Add("startTime", DateTime.Now);
+            AmendParameter(command);
+
+#if DEBUG
             Debug.WriteLine(AppendDbCommandInfo(command));
             Console.WriteLine(command.CommandText);
+#endif
         }
         public void ScalarExecuted(IDbCommand command, DbCommandInterceptionContext<object> interceptionContext)
         {
@@ -46,6 +59,29 @@ namespace Ace.Data
             //Console.WriteLine(DateTime.Now.Subtract(startTime).TotalMilliseconds);
             if (interceptionContext.Exception == null)
                 Console.WriteLine(interceptionContext.Result);
+        }
+
+        static void AmendParameter(IDbCommand command)
+        {
+            foreach (var parameter in command.Parameters)
+            {
+                if (parameter is OracleParameter)
+                {
+                    OracleParameter oracleParameter = (OracleParameter)parameter;
+                    if (oracleParameter.Value is string)
+                    {
+                        /* 针对 oracle 长文本做处理 */
+                        string value = (string)oracleParameter.Value;
+                        if (value != null && value.Length > 2000)
+                        {
+                            if (oracleParameter.DbType == DbType.String || oracleParameter.DbType == DbType.StringFixedLength)
+                                oracleParameter.OracleDbType = OracleDbType.NClob;
+                            else if (oracleParameter.DbType == DbType.AnsiString || oracleParameter.DbType == DbType.AnsiStringFixedLength)
+                                oracleParameter.OracleDbType = OracleDbType.Clob;
+                        }
+                    }
+                }
+            }
         }
 
 

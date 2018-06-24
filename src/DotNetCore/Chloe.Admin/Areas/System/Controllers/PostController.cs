@@ -20,7 +20,7 @@ namespace Chloe.Admin.Areas.System.Controllers
     {
         public ActionResult Index()
         {
-            List<Sys_Org> orgs = this.CreateService<IOrgService>().GetList();
+            List<SysOrg> orgs = this.CreateService<IOrgService>().GetList();
             this.ViewBag.Orgs = orgs;
             return View();
         }
@@ -28,7 +28,7 @@ namespace Chloe.Admin.Areas.System.Controllers
         [HttpGet]
         public ActionResult Models(string keyword)
         {
-            List<Sys_Post> data = this.Service.GetList(keyword);
+            List<SysPost> data = this.Service.GetList(keyword);
             return this.SuccessData(data);
         }
 
@@ -52,7 +52,7 @@ namespace Chloe.Admin.Areas.System.Controllers
         [HttpPost]
         public ActionResult Delete(string id)
         {
-            this.Service.Delete(id);
+            this.Service.Delete(id, this.CurrentSession.UserId);
             return this.DeleteSuccessMsg();
         }
 
@@ -60,8 +60,8 @@ namespace Chloe.Admin.Areas.System.Controllers
         {
             List<string> orgsIds = orgs.SplitString(',');
 
-            List<Sys_Org> orgList = this.CreateService<IOrgService>().GetListById(orgsIds);
-            List<Sys_Post> posts = this.Service.GetListByOrgId(orgsIds);
+            List<SysOrg> orgList = this.CreateService<IOrgService>().GetListById(orgsIds);
+            List<SysPost> posts = this.Service.GetListByOrgId(orgsIds);
 
             List<Select2Group> ret = new List<Select2Group>();
 

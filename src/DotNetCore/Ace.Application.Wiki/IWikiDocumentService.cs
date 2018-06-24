@@ -22,8 +22,12 @@ namespace Ace.Application.Wiki
         WikiDocumentDetail GetDocumentDetail(string id);
     }
 
-    public class WikiDocumentService : AdminAppService, IWikiDocumentService
+    public class WikiDocumentService : AppServiceBase, IWikiDocumentService
     {
+        public WikiDocumentService(IDbContext dbContext, IServiceProvider services) : base(dbContext, services)
+        {
+        }
+
         public WikiDocumentDetailModel GetDetailModel(string id)
         {
             var details = this.DbContext.Query<WikiDocumentDetail>().FilterDeleted();

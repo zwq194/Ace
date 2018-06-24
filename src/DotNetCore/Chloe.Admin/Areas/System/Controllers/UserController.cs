@@ -23,10 +23,10 @@ namespace Chloe.Admin.Areas.System.Controllers
         public ActionResult Index()
         {
             IOrgService orgService = this.CreateService<IOrgService>();
-            List<Sys_OrgType> orgTypes = orgService.GetOrgTypes();
+            List<SysOrgType> orgTypes = orgService.GetOrgTypes();
 
             List<Select2Group> orgGroups = new List<Select2Group>();
-            List<Sys_Org> orgs = orgService.GetList();
+            List<SysOrg> orgs = orgService.GetList();
             foreach (var item in orgs.GroupBy(a => a.OrgType).OrderBy(a => a.Key))
             {
                 int? orgType = item.Key;
@@ -38,7 +38,7 @@ namespace Chloe.Admin.Areas.System.Controllers
 
             this.ViewBag.Orgs = orgGroups;
 
-            List<Sys_Role> roles = this.CreateService<IRoleService>().GetList();
+            List<SysRole> roles = this.CreateService<IRoleService>().GetList();
             this.ViewBag.Roles = roles.Select(a => new Select2Item() { id = a.Id, text = a.Name });
             return View();
         }
@@ -46,7 +46,7 @@ namespace Chloe.Admin.Areas.System.Controllers
         [HttpGet]
         public ActionResult Models(Pagination pagination, string keyword)
         {
-            PagedData<Sys_User> pagedData = this.Service.GetPageData(pagination, keyword);
+            PagedData<SysUser> pagedData = this.Service.GetPageData(pagination, keyword);
             return this.SuccessData(pagedData);
         }
 
@@ -54,6 +54,7 @@ namespace Chloe.Admin.Areas.System.Controllers
         [HttpPost]
         public ActionResult Add(AddUserInput input)
         {
+            input.CreatorId = this.CurrentSession.UserId;
             this.Service.Add(input);
             return this.AddSuccessMsg();
         }
@@ -79,14 +80,14 @@ namespace Chloe.Admin.Areas.System.Controllers
 
         public ActionResult GetPermissionTree(string id)
         {
-            List<Sys_Permission> authList = this.CreateService<IPermissionService>().GetList();
-            List<Sys_UserPermission> authorizedata = new List<Sys_UserPermission>();
+            List<SysPermission> authList = this.CreateService<IPermissionService>().GetList();
+            List<SysUserPermission> authorizedata = new List<SysUserPermission>();
             if (!string.IsNullOrEmpty(id))
             {
                 authorizedata = this.Service.GetPermissions(id);
             }
             var treeList = new List<TreeViewModel>();
-            foreach (Sys_Permission auth in authList.Where(a => a.Type != PermissionType.公共菜单))
+            foreach (SysPermission auth in authList.Where(a => a.Type != PermissionType.公共菜单))
             {
                 string typeName = "";
                 if (auth.Type == PermissionType.权限菜单)

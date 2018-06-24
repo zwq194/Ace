@@ -23,18 +23,24 @@ namespace Ace.Application.System
         /// <param name="user"></param>
         /// <param name="msg"></param>
         /// <returns></returns>
-        bool CheckLogin(string userName, string password, out Sys_User user, out string msg);
+        bool CheckLogin(string userName, string password, out SysUser user, out string msg);
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="userId"></param>
         /// <param name="oldPassword">明文</param>
         /// <param name="newPassword">明文</param>
-        void ChangePassword(string oldPassword, string newPassword);
+        void ChangePassword(string userId, string oldPassword, string newPassword);
         void ModifyInfo(ModifyAccountInfoInput input);
     }
 
-    public class AccountAppService : AdminAppService, IAccountService
+    public class AccountAppService : AppServiceBase, IAccountService
     {
+        public AccountAppService(IDbContext dbContext, IServiceProvider services) : base(dbContext, services)
+        {
+
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -43,7 +49,7 @@ namespace Ace.Application.System
         /// <param name="user"></param>
         /// <param name="msg"></param>
         /// <returns></returns>
-        public bool CheckLogin(string loginName, string password, out Sys_User user, out string msg)
+        public bool CheckLogin(string loginName, string password, out SysUser user, out string msg)
         {
             user = null;
             msg = null;
@@ -51,7 +57,7 @@ namespace Ace.Application.System
             loginName.NotNullOrEmpty();
             password.NotNullOrEmpty();
 
-            var view = this.DbContext.JoinQuery<Sys_User, Sys_UserLogOn>((u, userLogOn) => new object[]
+            var view = this.DbContext.JoinQuery<SysUser, SysUserLogOn>((u, userLogOn) => new object[]
             {
                 JoinType.InnerJoin,u.Id == userLogOn.UserId
             })
@@ -89,8 +95,8 @@ namespace Ace.Application.System
                 }
             }
 
-            Sys_User userEntity = viewEntity.User;
-            Sys_UserLogOn userLogOnEntity = viewEntity.UserLogOn;
+            SysUser userEntity = viewEntity.User;
+            SysUserLogOn userLogOnEntity = viewEntity.UserLogOn;
 
             string dbPassword = PasswordHelper.EncryptMD5Password(password, userLogOnEntity.UserSecretkey);
             if (dbPassword != userLogOnEntity.UserPassword)
@@ -100,7 +106,7 @@ namespace Ace.Application.System
             }
 
             DateTime lastVisitTime = DateTime.Now;
-            this.DbContext.Update<Sys_UserLogOn>(a => a.Id == userLogOnEntity.Id, a => new Sys_UserLogOn() { LogOnCount = a.LogOnCount + 1, PreviousVisitTime = userLogOnEntity.LastVisitTime, LastVisitTime = lastVisitTime });
+            this.DbContext.Update<SysUserLogOn>(a => a.Id == userLogOnEntity.Id, a => new SysUserLogOn() { LogOnCount = a.LogOnCount + 1, PreviousVisitTime = userLogOnEntity.LastVisitTime, LastVisitTime = lastVisitTime });
             user = userEntity;
             return true;
         }
@@ -110,13 +116,11 @@ namespace Ace.Application.System
         /// </summary>
         /// <param name="oldPassword">明文</param>
         /// <param name="newPassword">明文</param>
-        public void ChangePassword(string oldPassword, string newPassword)
+        public void ChangePassword(string userId, string oldPassword, string newPassword)
         {
             PasswordHelper.EnsurePasswordLegal(newPassword);
 
-            AdminSession session = this.Session;
-
-            Sys_UserLogOn userLogOn = this.DbContext.Query<Sys_UserLogOn>().Where(a => a.UserId == session.UserId).First();
+            SysUserLogOn userLogOn = this.DbContext.Query<SysUserLogOn>().Where(a => a.UserId == userId).First();
 
             string encryptedOldPassword = PasswordHelper.Encrypt(oldPassword, userLogOn.UserSecretkey);
 
@@ -128,8 +132,8 @@ namespace Ace.Application.System
 
             this.DbContext.DoWithTransaction(() =>
             {
-                this.DbContext.Update<Sys_UserLogOn>(a => a.UserId == session.UserId, a => new Sys_UserLogOn() { UserSecretkey = newUserSecretkey, UserPassword = newEncryptedPassword });
-                this.Log(LogType.Update, "Account", true, "用户[{0}]修改密码".ToFormat(session.UserId));
+                this.DbContext.Update<SysUserLogOn>(a => a.UserId == userId, a => new SysUserLogOn() { UserSecretkey = newUserSecretkey, UserPassword = newEncryptedPassword });
+                //this.Log(LogType.Update, "Account", true, "用户[{0}]修改密码".ToFormat(userId));
             });
         }
 
@@ -140,9 +144,7 @@ namespace Ace.Application.System
 
             input.Validate();
 
-            var session = this.Session;
-
-            Sys_User user = this.DbContext.Query<Sys_User>().FilterDeleted().Where(a => a.Id == session.UserId).AsTracking().First();
+            SysUser user = this.DbContext.Query<SysUser>().FilterDeleted().Where(a => a.Id == input.UserId).AsTracking().First();
 
             string accountName = user.AccountName;
 
@@ -153,7 +155,7 @@ namespace Ace.Application.System
                 {
                     accountName = input.AccountName.ToLower();
                     AceUtils.EnsureAccountNameLegal(accountName);
-                    bool exists = this.DbContext.Query<Sys_User>().Where(a => a.AccountName == accountName).Any();
+                    bool exists = this.DbContext.Query<SysUser>().Where(a => a.AccountName == accountName).Any();
                     if (exists)
                         throw new InvalidInputException("用户名[{0}]已存在".ToFormat(input.AccountName));
                 }
@@ -166,7 +168,7 @@ namespace Ace.Application.System
             user.WeChat = input.WeChat;
             user.Description = input.Description;
 
-            this.DbContext.Update<Sys_User>(user);
+            this.DbContext.Update<SysUser>(user);
         }
     }
 

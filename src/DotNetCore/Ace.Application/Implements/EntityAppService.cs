@@ -10,6 +10,10 @@ namespace Ace.Application.Implements
 {
     public class EntityAppService : AppServiceBase, IEntityAppService
     {
+        public EntityAppService(IDbContext dbContext, IServiceProvider services) : base(dbContext, services)
+        {
+        }
+
         public TEntity GetByKey<TEntity>(object key)
         {
             return this.DbContext.QueryByKey<TEntity>(key);
@@ -40,7 +44,7 @@ namespace Ace.Application.Implements
             key.NotNullOrEmpty("key 不能为空");
             return this.DbContext.SoftDelete<TEntity>(key);
         }
-        public int SoftDelete<TEntity>(object key, object deleteUserId)
+        public new int SoftDelete<TEntity>(object key, object deleteUserId)
         {
             key.NotNullOrEmpty("key 不能为空");
             return this.DbContext.SoftDelete<TEntity>(key, deleteUserId);

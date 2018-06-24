@@ -34,19 +34,6 @@ namespace Chloe.Home.Common
 
     public abstract class WebController : BaseController
     {
-        [Disposable]
-        IAppServiceFactory _appServicesFactory;
-        IAppServiceFactory AppServicesFactory
-        {
-            get
-            {
-                if (this._appServicesFactory == null)
-                    this._appServicesFactory = new AppServiceFactory(this.HttpContext.RequestServices, null);
-                return this._appServicesFactory;
-            }
-        }
-
-
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             ObsoleteApiAttribute obsoleteAttr = filterContext.ActionDescriptor.FilterDescriptors.Where(a => a.Filter is ObsoleteApiAttribute).Select(a => a.Filter).FirstOrDefault() as ObsoleteApiAttribute;
@@ -63,13 +50,7 @@ namespace Chloe.Home.Common
 
             base.OnActionExecuting(filterContext);
         }
-
-
-        protected T CreateService<T>()
-        {
-            return this.AppServicesFactory.CreateService<T>();
-        }
-
+ 
         protected ActionResult InternalError()
         {
             this.Response.StatusCode = 500;

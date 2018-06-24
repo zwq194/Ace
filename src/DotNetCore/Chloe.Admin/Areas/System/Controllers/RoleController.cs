@@ -26,7 +26,7 @@ namespace Chloe.Admin.Areas.System.Controllers
         [HttpGet]
         public ActionResult Models(string keyword)
         {
-            List<Sys_Role> data = this.Service.GetRoles(keyword);
+            List<SysRole> data = this.Service.GetRoles(keyword);
             return this.SuccessData(data);
         }
 
@@ -34,6 +34,7 @@ namespace Chloe.Admin.Areas.System.Controllers
         [HttpPost]
         public ActionResult Add(AddRoleInput input)
         {
+            input.CreateUserId = this.CurrentSession.UserId;
             this.Service.Add(input);
             return this.AddSuccessMsg();
         }
@@ -50,20 +51,20 @@ namespace Chloe.Admin.Areas.System.Controllers
         [HttpPost]
         public ActionResult Delete(string id)
         {
-            this.Service.Delete(id);
+            this.Service.Delete(id, this.CurrentSession.UserId);
             return this.DeleteSuccessMsg();
         }
 
         public ActionResult GetPermissionTree(string id)
         {
-            List<Sys_Permission> authList = this.CreateService<IPermissionService>().GetList();
-            List<Sys_RolePermission> authorizedata = new List<Sys_RolePermission>();
+            List<SysPermission> authList = this.CreateService<IPermissionService>().GetList();
+            List<SysRolePermission> authorizedata = new List<SysRolePermission>();
             if (!string.IsNullOrEmpty(id))
             {
                 authorizedata = this.Service.GetPermissions(id);
             }
             var treeList = new List<TreeViewModel>();
-            foreach (Sys_Permission auth in authList.Where(a => a.Type != PermissionType.公共菜单))
+            foreach (SysPermission auth in authList.Where(a => a.Type != PermissionType.公共菜单))
             {
                 string typeName = "";
                 if (auth.Type == PermissionType.权限菜单)
