@@ -5,9 +5,9 @@
 @using Ace.Application.Wiki;
 @using Chloe.Home.Models;
 @section ScriptAndStyle{
-    @this.RefStyle("~/Content/editormd/css/editormd.min.css")
-    @this.RefStyle("~/Content/css/wx.css")
-    @this.RefScript("~/Content/editormd/lib/prettify.min.js")
+    <link href="/Content/editormd/css/editormd.min.css" rel="stylesheet" />
+    <link href="/Content/css/wx.css" rel="stylesheet" />
+    <script type="text/javascript" src="/Content/editormd/lib/prettify.min.js"></script>
 }
 <script>
     $(function () {

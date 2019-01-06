@@ -11,35 +11,30 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace Chloe.Admin.Common
 {
-    public class WebPermissionFilter : PermissionFilter
+    public static class PermissionCheckHelper
     {
         public const string USER_PERMITS_CACHE_KEY = "_UPERMITS_";
 
-        IMemoryCache _cache;
-
-        public WebPermissionFilter(IMemoryCache cache)
+        public static bool HasPermission(HttpContext httpContext, List<string> permissionCodes)
         {
-            this._cache = cache;
-        }
-
-        protected override bool HasExecutePermission(AuthorizationFilterContext filterContext, List<string> permissionCodes)
-        {
-            ClaimsPrincipal user = filterContext.HttpContext.User;
+            ClaimsPrincipal user = httpContext.User;
             string accountName = user.Claims.FirstOrDefault(x => x.Type == "AccountName").Value;
             if (accountName == Ace.Entity.System.SysUser.AdminAccountName)
                 return true;
+
+            IMemoryCache cache = httpContext.RequestServices.GetService(typeof(IMemoryCache)) as IMemoryCache;
 
             List<string> usePermits = null;
 
             string userId = user.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
             string cacheKey = USER_PERMITS_CACHE_KEY + userId;
-            usePermits = this._cache.Get<List<string>>(cacheKey);
+            usePermits = cache.Get<List<string>>(cacheKey);
 
             if (usePermits == null)
             {
-                IUserService userService = filterContext.HttpContext.RequestServices.GetService(typeof(IUserService)) as IUserService;
+                IUserService userService = httpContext.RequestServices.GetService(typeof(IUserService)) as IUserService;
                 usePermits = userService.GetUserPermits(userId);
-                _cache.Set(cacheKey, usePermits, TimeSpan.FromMinutes(2));//缓存2分钟，2分钟后重新加载
+                cache.Set(cacheKey, usePermits, TimeSpan.FromMinutes(2));//缓存2分钟，2分钟后重新加载
             }
 
             foreach (string permit in permissionCodes)
@@ -49,6 +44,17 @@ namespace Chloe.Admin.Common
             }
 
             return true;
+        }
+    }
+    public class WebPermissionFilter : PermissionFilter
+    {
+        public WebPermissionFilter()
+        {
+        }
+
+        protected override bool HasExecutePermission(AuthorizationFilterContext filterContext, List<string> permissionCodes)
+        {
+            return PermissionCheckHelper.HasPermission(filterContext.HttpContext, permissionCodes);
         }
     }
 }

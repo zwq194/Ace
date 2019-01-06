@@ -3,33 +3,28 @@
 <html>
 <head>
     <title>@ViewBag.Title</title>
-    @this.RefScript("~/Content/jquery/jquery-1.11.1.min.js")
-    @*@Html.RefScript("~/Content/js/framework-ui.js")*@
+    <script src="/Content/jquery/jquery-1.11.1.min.js"></script>
 
-    @this.RefStyle("~/Content/jquery-ui/jquery-ui.min.css")
-    @this.RefScript("~/Content/jquery-ui/jquery-ui.min.js")
+    <link href="/Content/jquery-ui/jquery-ui.min.css" rel="stylesheet" />
+    <script type="text/javascript" src="/Content/jquery-ui/jquery-ui.min.js"></script>
 
-    @this.RefStyle("~/Content/bootstrap/bootstrap.min.css")
-    @this.RefScript("~/Content/bootstrap/bootstrap.min.js")
+    <link href="/Content/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <script type="text/javascript" src="/Content/bootstrap/bootstrap.min.js"></script>
 
-    @this.RefStyle("~/Content/font-awesome/font-awesome.min.css")
-    @*@Html.RefStyle("~/Content/css/framework-theme.css")*@
-    @*@this.RefStyle("~/Content/css/framework-ui.css")*@
-    @this.RefStyle("~/Content/css/style.css")
+    <link href="/Content/font-awesome/font-awesome.min.css" rel="stylesheet" />
 
-    @this.RefScript("~/Content/knockout/knockout-3.4.2.js")
-    @*@this.RefScript("~/Content/knockout/knockout-3.4.2.debug.js")*@
-    @*@this.RefScript("~/Content/knockout/knockout-latest.js")*@
-    @this.RefScript("~/Content/knockout/knockout.mapping-latest.js")
-    @this.RefScript("~/Content/js/kohelper.js")
+    <link href="/Content/css/style.css" rel="stylesheet" />
 
-    @this.RefScript("~/Content/validate/jquery.validate.min.js")
-    @*@this.RefScript("~/Content/datepicker/WdatePicker.js")*@
-    @this.RefScript("~/Content/My97DatePicker/WdatePicker.js")
+    <script type="text/javascript" src="/Content/knockout/knockout-3.4.2.js"></script>
+    <script type="text/javascript" src="/Content/knockout/knockout.mapping-latest.js"></script>
+    <script type="text/javascript" src="/Content/js/kohelper.js"></script>
+    <script type="text/javascript" src="/Content/validate/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="/Content/My97DatePicker/WdatePicker.js"></script>
 
-    @this.RefStyle("~/Content/layer/layer.css")
-    @this.RefScript("~/Content/layer/layer.js")
-    @this.RefScript("~/Content/js/ace.js")
+    <link href="/Content/layer/layer.css" rel="stylesheet" />
+    <script type="text/javascript" src="/Content/layer/layer.js"></script>
+
+    <script type="text/javascript" src="/Content/js/ace.js"></script>
 
     <script>
         $(function () {

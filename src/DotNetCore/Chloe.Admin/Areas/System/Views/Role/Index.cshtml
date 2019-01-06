@@ -2,17 +2,21 @@
     ViewBag.Title = "Index";
 }
 
-@this.RefStyle("~/Content/wdtree/tree.css")
-@this.RefScript("~/Content/wdtree/tree.js")
+<link rel="stylesheet" href="/Content/wdtree/tree.css" />
+<script type="text/javascript" src="/Content/wdtree/tree.js"></script>
+
 @this.Partial("Index_js")
 
 <div style="max-width:1000px;">
     <div class="topPanel">
         <div class="toolbar">
             <a class="a-btn-refresh" onclick="$ace.reload()"></a>
-            <button class="a-btn-edit" data-bind="click:edit,disable:!dataTable.selectedModel()">修改</button>
-            <button class="a-btn-add" data-bind="click:add">添加</button>
-            <button class="a-btn-delete" data-bind="click:del,disable:!dataTable.selectedModel()">删除</button>
+
+            <button permission="system.role.update" class="a-btn-edit" data-bind="click:edit,disable:!dataTable.selectedModel()">修改</button>
+            <button permission="system.role.add" class="a-btn-add" data-bind="click:add">添加</button>
+            <button permission="system.role.delete" class="a-btn-delete" data-bind="click:del,disable:!dataTable.selectedModel()">删除</button>
+            @*<button permission="system.role.set_permission" class="a-btn-primary fa fa-eye" data-bind="click:assignPermission,attr:{disabled:!dataTable.selectedModel()}">权限设置</button>*@
+
             <button class="a-btn-primary fa fa-eye" data-bind="click:assignPermission,attr:{disabled:!dataTable.selectedModel()}">权限设置</button>
         </div>
         <div class="search">

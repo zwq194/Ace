@@ -11,15 +11,15 @@
 
     function format(format) {
         var o =
-            {
-                "M+": this.getMonth() + 1, //month
-                "d+": this.getDate(),    //day
-                "h+": this.getHours(),   //hour
-                "m+": this.getMinutes(), //minute
-                "s+": this.getSeconds(), //second
-                "q+": Math.floor((this.getMonth() + 3) / 3),  //quarter
-                "S": this.getMilliseconds() //millisecond
-            };
+        {
+            "M+": this.getMonth() + 1, //month
+            "d+": this.getDate(),    //day
+            "H+": this.getHours(),   //hour
+            "m+": this.getMinutes(), //minute
+            "s+": this.getSeconds(), //second
+            "q+": Math.floor((this.getMonth() + 3) / 3),  //quarter
+            "S": this.getMilliseconds() //millisecond
+        };
         if (/(y+)/.test(format))
             format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
         for (var k in o)
@@ -382,6 +382,17 @@
             }
 
             $(element).addClass(className);
+        }
+    }
+
+    ko.bindingHandlers['pagger'] = {
+        'init': function (element, valueAccessor, allBindingsAccessor) {
+            var model = ko.utils.unwrapObservable(valueAccessor());
+            $(element).paging(model);
+        },
+        'update': function (element, valueAccessor, allBindingsAccessor) {
+            var model = ko.utils.unwrapObservable(valueAccessor());
+            $(element).paging(model);
         }
     }
 

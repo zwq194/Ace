@@ -398,7 +398,7 @@ button.a-btn-link {
 /*-------------ul-------------*/
 
 ul li {
-list-style:none;
+    list-style: none;
 }
 
 /*===============ul===============*/
@@ -407,6 +407,7 @@ list-style:none;
 .fa-ellipsis-h:before {
     content: "\f141"
 }
+
 .topPanel {
     height: 50px;
     line-height: 50px;
@@ -571,9 +572,9 @@ list-style:none;
     display: inline-block;
     vertical-align: middle;
     margin: 10px 0;
-    font-size: 0;
     line-height: 24px;
-    font: 14px Helvetica Neue,Helvetica,PingFang SC,\5FAE\8F6F\96C5\9ED1,Tahoma,Arial,sans-serif;
+    font-size: 12px;
+    font: Helvetica Neue,Helvetica,PingFang SC,\5FAE\8F6F\96C5\9ED1,Tahoma,Arial,sans-serif;
 }
 
     .fx-page, .fx-page * {
@@ -582,72 +583,74 @@ list-style:none;
         box-sizing: content-box !important;
     }
 
-        .fx-page .fx-page-span {
+        .fx-page .fx-page-btn {
             vertical-align: middle;
             padding: 0 15px;
             border: 1px solid #e2e2e2;
+            border-right: 0.5px solid #e2e2e2;
+            border-left: 0.5px solid #e2e2e2;
             height: 28px;
             line-height: 28px;
             background-color: #fff;
             color: #333;
             font-size: 12px;
-            /*margin: 0 -3px !important;*/
             float: left;
-            margin: -1px;
         }
 
-        .fx-page a {
-            text-decoration: none;
-        }
+.fx-page-btn:first-child {
+    border-left: 1px solid #e2e2e2;
+}
 
-        .fx-page span {
-            /*color: #999;*/
-            font-weight: 700;
-            font-size: 12px;
-        }
+.fx-page-btn:last-child {
+    border-right: 1px solid #e2e2e2;
+}
 
-        .fx-page .fx-page-curr {
-            cursor: default;
-            background-color: #009688;
-            color: #fff;
-            border: 1px solid #009688;
-        }
+.fx-page a {
+    text-decoration: none;
+}
 
-        .fx-page .fx-page-total {
-            height: 30px;
-            line-height: 30px;
-            margin-left: 1px;
-            border: none;
-            font-weight: 400;
-        }
+.fx-page .fx-page-curr {
+    cursor: default;
+    background-color: #009688;
+    color: #fff;
+    border: 1px solid #009688;
+}
 
-        .fx-page button {
-            margin-left: 5px;
-            padding: 0 15px;
-            cursor: pointer;
-        }
+.fx-page .fx-page-total {
+    height: 30px;
+    line-height: 30px;
+    margin-left: 1px;
+    border: none;
+    font-weight: 400;
+}
 
-        .fx-page input {
-            width: 50px;
-            margin: 0 5px;
-            text-align: center;
-        }
+.fx-page button {
+    margin-left: 5px;
+    padding: 0 18px;
+    cursor: pointer;
+}
 
-        .fx-page button, .fx-page input {
-            height: 30px;
-            line-height: 30px;
-            border: 1px solid #e2e2e2;
-            border-radius: 2px;
-            vertical-align: top;
-            background-color: #fff;
-            box-sizing: border-box !important;
-         }
+.fx-page input {
+    width: 50px;
+    margin: 0 5px;
+    text-align: center;
+}
 
-        .fx-page button, input {
-            font-family: inherit;
-            font-size: inherit;
-            font-style: inherit;
-            font-weight: inherit;
-            outline: 0;
-        }
+.fx-page button, .fx-page input {
+    height: 30px;
+    line-height: 30px;
+    border: 1px solid #e2e2e2;
+    border-radius: 0px;
+    vertical-align: top;
+    background-color: #fff;
+    box-sizing: border-box !important;
+}
+
+.fx-page button, input {
+    font-family: inherit;
+    font-size: inherit;
+    font-style: inherit;
+    font-weight: inherit;
+    outline: 0;
+}
 /* end fx-page */

@@ -1,9 +1,39 @@
 ﻿
 /* 异步请求结果返回状态码 */
-var ResultStatus = { OK: 100, Failed: 101, NotLogin: 102, Unauthorized: 103 };
+var ResultStatus = { OK: 100, Failed: 101 };
 
+String.format = function (str) {
+    var args = arguments, re = new RegExp("%([1-" + args.length + "])", "g");
+    return String(str).replace(
+        re,
+        function ($1, $2) {
+            return args[$2];
+        }
+    );
+}
 String.formatDate = function (format) {
     return formatDate(this, format);
+}
+String.prototype.startsWith = function (str) {
+    if (str === null || str === undefined || str == "" || this.length == 0 || str.length > this.length) {
+        return false;
+    }
+    if (this.substr(0, str.length) == str) {
+        return true;
+    }
+
+    return false;
+}
+String.prototype.endsWith = function (str) {
+    if (str === null || str === undefined || str == "" || this.length == 0 || str.length > this.length) {
+        return false;
+    }
+
+    if (this.substr(this.length - str.length) == str) {
+        return true;
+    }
+
+    return false;
 }
 
 function formatDate(date, format) {
@@ -21,18 +51,57 @@ function formatDate(date, format) {
 
     return date;
 }
+function isDateTimeFormat(str) {
+    if (!str)
+        return false;
+
+    var dateString = str.replace(/-/g, "/").replace("T", " ");
+    var date = new Date(dateString);
+    if (date == "Invalid Date") {
+        return false;
+    }
+
+    return true;
+}
+function compareDateTime(date1, date2) {
+    date1 = convertToDate(date1);
+    date2 = convertToDate(date2);
+
+    if (date1 > date2)
+        return 1;
+
+    if (date1 < date2)
+        return -1;
+
+    return 0;
+}
+function isNumber(str) {
+    if (str === null || str === undefined)
+        return false;
+
+    str = str.trim();
+    if (str == "")
+        return false;
+
+    var reg = /(^[0-9]+$)|(^[0-9]+\.[0-9]+$)/;
+    if (reg.test(str)) {
+        return true;
+    }
+
+    return false;
+}
 
 Date.prototype.format = function (format) {
     var o =
-        {
-            "M+": this.getMonth() + 1, //month
-            "d+": this.getDate(),    //day
-            "H+": this.getHours(),   //hour
-            "m+": this.getMinutes(), //minute
-            "s+": this.getSeconds(), //second
-            "q+": Math.floor((this.getMonth() + 3) / 3),  //quarter
-            "S": this.getMilliseconds() //millisecond
-        };
+    {
+        "M+": this.getMonth() + 1, //month
+        "d+": this.getDate(),    //day
+        "H+": this.getHours(),   //hour
+        "m+": this.getMinutes(), //minute
+        "s+": this.getSeconds(), //second
+        "q+": Math.floor((this.getMonth() + 3) / 3),  //quarter
+        "S": this.getMilliseconds() //millisecond
+    };
     if (/(y+)/.test(format))
         format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
     for (var k in o)
@@ -156,6 +225,12 @@ function newGuid() {
     }
     return guid;
 };
+function isEmpty(str) {
+    return str === null || str === "" || str === undefined;
+}
+function isNotEmpty(str) {
+    return !isEmpty(str);
+}
 
 /* $ace */
 (function ($) {
@@ -188,8 +263,8 @@ function newGuid() {
     $ace.confirm = function (msg, callBack) {
         layerConfirm(msg, callBack);
     }
-    $ace.msg = function (msg) {
-        layerMsg(msg);
+    $ace.msg = function (msg, showTime, callBack) {
+        layerMsg(msg, showTime, callBack);
     }
     /* 加载提示，不会自动消失，需手动关闭 */
     $ace.load = function (msg) {
@@ -253,6 +328,50 @@ function newGuid() {
         }
         return params;
     }
+    $ace.convertToQueryString = function (model) {
+        var c = "";
+        var ret = "";
+        for (var name in model) {
+            var value = model[name];
+            if (value === null || value === undefined || $.isFunction(value))
+                continue;
+
+            if ($.isPlainObject(value) || $.isArray(value))
+                value = JSON.stringify(value);
+
+            ret = ret + c;
+            ret = ret + name + "=" + encodeURI(value);
+            c = "&";
+        }
+
+        return ret;
+    }
+
+    $ace.cookie = {
+        get: function (name) {
+            var cookieValue = null;
+            var search = name + "=";
+            if (document.cookie.length > 0) {
+                offset = document.cookie.indexOf(search);
+                if (offset != -1) {
+                    offset += search.length;
+                    end = document.cookie.indexOf(";", offset);
+                    if (end == -1)
+                        end = document.cookie.length;
+                    cookieValue = unescape(document.cookie.substring(offset, end));
+                }
+            }
+            return cookieValue;
+        },
+        set: function (name, value, hours) {
+            var expire = "";
+            if (hours != null) {
+                expire = new Date((new Date()).getTime() + hours * 3600000);
+                expire = "; expires=" + expire.toGMTString();
+            }
+            document.cookie = name + "=" + escape(value) + expire + ";path=/";
+        }
+    };
 
     $ace.findName = function (optionList, value, valuePropName, textPropName) {
         valuePropName = valuePropName || "Id";
@@ -402,14 +521,6 @@ function newGuid() {
                         layerAlert(result.Msg || "操作失败");
                         return;
                     }
-                    if (result.Status == ResultStatus.NotLogin) {
-                        layerAlert(result.Msg || "未登录或登录过期，请重新登录");
-                        return;
-                    }
-                    if (result.Status == ResultStatus.Unauthorized) {
-                        layerAlert(result.Msg || "权限不足，禁止访问");
-                        return;
-                    }
 
                     if (result.Status == ResultStatus.OK) {
                         /* 传 result，用 result.Data 还是 result.Msg，由调用者决定 */
@@ -419,12 +530,39 @@ function newGuid() {
                 else
                     callback(result);
             },
-            error: errorCallback
+            error: errorCallback,
+            statusCode: {
+                401: function (xhr) {
+                    var result = xhr.responseJSON;
+                    var isStandardResult = ("Status" in result) && ("Msg" in result);
+                    if (isStandardResult) {
+                        layerAlert(result.Msg || "未登录或登录过期，请重新登录");
+                        return;
+                    }
+
+                    layerAlert("未登录或登录过期，请重新登录");
+                },
+                403: function (xhr) {
+                    var result = xhr.responseJSON;
+                    var isStandardResult = ("Status" in result) && ("Msg" in result);
+                    if (isStandardResult) {
+                        layerAlert(result.Msg || "权限不足，禁止访问");
+                        return;
+                    }
+
+                    layerAlert(result.Msg || "权限不足，禁止访问");
+                }
+            }
         });
         return ret;
     }
     function errorCallback(xhr, textStatus, errorThrown) {
-        var json = { textStatus: textStatus, errorThrown: errorThrown };
+
+        if (xhr.status == 401 || xhr.status == 403) {
+            return;
+        }
+
+        var json = { statusCode: xhr.status, textStatus: textStatus, errorThrown: errorThrown };
         alert("请求失败: " + JSON.stringify(json));
     }
     function parseUrl(url) {
@@ -478,9 +616,21 @@ function newGuid() {
 
         });
     }
-    function layerMsg(msg, callBack) {
+    function layerMsg(msg, showTime, callBack) {
+        var time = 2000;//单位毫秒
+
+        if ($.isFunction(showTime))
+            callBack = showTime;
+        else if (showTime)
+            time = showTime;
+
         msg = msg == null ? "" : msg;/* layer.msg 传 null 会报错 */
-        layer.msg(msg, { time: 2000, shift: 0 });
+
+        if (!callBack) {
+            callBack = function () { }
+        }
+
+        layer.msg(msg, { time: time, shift: 0 }, callBack);
     }
 
 
@@ -535,6 +685,28 @@ function newGuid() {
 
         return ret;
     };
+    $.fn.getSelectedOption = function () {
+        if (this.length == 0)
+            return null;
+
+        var selectElement = this[0];
+        var idx = selectElement.selectedIndex;
+        return { value: selectElement[idx].value, text: selectElement[idx].text };
+    }
+    $.fn.appendOptions = function (options, valueSource, textSource) {
+        valueSource = valueSource || "value";
+        textSource = textSource || "text";
+
+        for (var i = 0; i < options.length; i++) {
+            var option = options[i];
+
+            var $option = $('<option></option>');
+            $option.val(option[valueSource]);
+            $option.text(option[textSource]);
+
+            $(this).append($option);
+        }
+    }
 
     /* 设置 radio、checkbox 状态为选中 */
     $.fn.checked = function () {
@@ -645,11 +817,12 @@ function newGuid() {
             if (!name)
                 return;
 
-            var type = $this.attr('type');
             if ($this.attr("disabled") == "disabled")
                 return;
 
-            switch (type) {
+            var nodeType = getNodeType(this);
+
+            switch (nodeType) {
                 case "checkbox":
                     var checkboxValues;
                     if (name in model) {
@@ -688,11 +861,8 @@ function newGuid() {
         $form.find('input,select,textarea').each(function (r) {
             var $ele = $(this);
             var name = $ele.attr('name');
-
             if (!name)
                 return;
-
-            var type = $ele.attr('type');
 
             var value = null;
             if (name in data)
@@ -700,7 +870,9 @@ function newGuid() {
             else
                 return;//如果模型中不存在相应的name属性，则不管
 
-            switch (type) {
+            var nodeType = getNodeType(this);
+
+            switch (nodeType) {
                 case "checkbox":
                     var values = value || []; //对于checkbox，value是一个数组
 
@@ -721,6 +893,9 @@ function newGuid() {
                     $ele.setChecked(value);
                     break;
                 case "select":
+                    if ($.isPlainObject(value) && value.value) { //{value: 1, text: "123"}
+                        value = value.value;
+                    }
                     $ele.val(value).trigger("change");
                     break;
                 case "button":
@@ -731,6 +906,15 @@ function newGuid() {
             }
         });
     };
+    function getNodeType(ele) {
+        var nodeName = ele.nodeName.toLowerCase();
+        var nodeType = nodeName;
+        if (nodeName === "input") {
+            nodeType = $ele.attr('type');
+        }
+
+        return nodeType;
+    }
 
     $.fn.bindSelect = function (options) {
         var defaults = {
@@ -766,6 +950,106 @@ function newGuid() {
         $element.removeAttr("disabled");
     }
 
+    $.fn.paging = function (options) {
+        var defaults = { totalCount: 0, pageSize: 20, currentPage: 1, showPageCount: 6, callback: function (page) { } };
+        options = $.extend({}, defaults, options);
+
+        function pagingHanler(page) {
+            return function () { options.callback(page); };
+        }
+        function getPageBtn(text, pageTo) {
+            var $btn = $('<a class="fx-page-btn" href="javascript:;"></a>');
+            $btn.text(text);
+            $btn.click(pagingHanler(pageTo));
+            return $btn;
+        }
+
+        var $html = $('<div class="fx-page"></div>');
+
+        var $btns = $('<span class="fx-page-btns"></span>');
+        $html.append($btns);
+
+        if (options.currentPage != 1) {
+            var $btn = getPageBtn("上一页", options.currentPage - 1);
+            $btns.append($btn);
+        }
+
+        var totalPage = 0;
+        if (options.totalCount > 0) {
+            if ((options.totalCount % options.pageSize) == 0) {
+                totalPage = parseInt(options.totalCount / options.pageSize);
+            }
+            else {
+                totalPage = parseInt(options.totalCount / options.pageSize) + 1;
+            }
+        }
+
+        var min = options.currentPage - (options.showPageCount / 2);
+
+        if (min < 1)
+            min = 1;
+
+        var max = min + options.showPageCount;
+
+        if (max > totalPage) {
+            max = totalPage;
+            min = max - options.showPageCount;
+            if (min < 1)
+                min = 1;
+        }
+
+
+
+        if (min != 1) {
+            var $btn = getPageBtn(1, 1);
+            $btn.attr("title", "首页");
+            $btns.append($btn);
+            $btns.append('<span class="fx-page-btn">...</span>');
+        }
+
+        for (var i = min; i <= max; i++) {
+            if (i == options.currentPage) {
+                $btns.append('<span class="fx-page-btn fx-page-curr">' + i + '</span>');
+                continue;
+            }
+
+            var $btn = getPageBtn(i, i);
+            $btns.append($btn);
+        }
+
+        if (max != totalPage) {
+            $btns.append('<span class="fx-page-btn">...</span>');
+            var $btn = getPageBtn(totalPage, totalPage);
+            $btns.append($btn);
+        }
+
+        if (options.currentPage < totalPage) {
+            var $btn = getPageBtn("下一页", options.currentPage + 1);
+            $btns.append($btn);
+        }
+
+        $html.append('<span>&nbsp;共<span class="fx-page-total">' + options.totalCount + '</span>条</span>');
+
+        var $x = $('<span>到第<input type="number" min="1" />页 <button type="button" class="fx-btn-go">GO</button></span>');
+
+        var $toPageInput = $x.find('input');
+        $toPageInput.val(options.currentPage);
+        $toPageInput.keyup(function () {
+            $toPageInput.val($toPageInput.val().replace(/\D/, ''));
+        });
+
+        $x.find('button').click(function () {
+            var page = $toPageInput.val();
+            if (page < 1 || page > totalPage || page == options.currentPage)
+                return;
+
+            pagingHanler(parseInt(page))();
+        });
+
+        $html.append($x);
+
+        $(this).html($html);
+    }
 
     $.loading = function (bool, text) {
         var $loadingpage = top.$("#loadingPage");
@@ -847,6 +1131,7 @@ function ViewModel() {
     me.getSearchModel = function () {
         var model = me.searchModel();
         model = JSON.parse(JSON.stringify(model));
+
         return model;
     }
 
@@ -917,62 +1202,24 @@ function PagedDataTable(vmOrDataLoader) {
     var me = this;
     DataTable.call(me, vmOrDataLoader);
 
-    me.showFirstPage = _ob(false);
-    me.showLastPage = _ob(false);
-    me.totalCount = _ob(0);
-    me.totalPage = _ob(0);
-    me.currentPage = _ob(0);
-    me.skipPage = _ob(0);
-    me.pageSize = _ob(0);
-
-    me.showPages = _oba();
+    me.pagger = _ob({});
 
     me.getOrdinal = function ($index) {
-        return (me.currentPage() - 1) * me.pageSize() + $index + 1;
+        return (me.pagger().currentPage - 1) * me.pagger().pageSize + $index + 1;
     }
 
     me.setData = function (pagedData) {
         var wrapedData = $ko.toOb(pagedData);
         me.models(wrapedData.Models());
-        me.totalCount(wrapedData.TotalCount());
-        me.totalPage(wrapedData.TotalPage());
-        me.currentPage(wrapedData.CurrentPage());
-        me.skipPage(wrapedData.CurrentPage());
-        me.pageSize(wrapedData.PageSize());
 
-        var showPageCount = 6;
+        var pageOptions = { totalCount: wrapedData.TotalCount(), pageSize: wrapedData.PageSize(), currentPage: wrapedData.CurrentPage(), showPageCount: 6 };
 
-        var min = me.currentPage() - (showPageCount / 2);
-
-        if (min < 1)
-            min = 1;
-
-        var max = min + showPageCount;
-
-        if (max > me.totalPage()) {
-            max = me.totalPage();
-            min = max - showPageCount;
-            if (min < 1)
-                min = 1;
+        pageOptions.callback = function (page) {
+            me.loadData(page);
         }
 
-        var showPages = [];
-        for (var i = min; i <= max; i++) {
-            showPages.push(i);
-        }
-        me.showPages(showPages);
-
-        me.showFirstPage(min != 1);
-        me.showLastPage(max != me.totalPage());
+        me.pagger(pageOptions);
         me.selectedModel(null);
-    }
-    me.setPagedData = function (pagedData) {
-        me.setData();
-    }
-    me.toPage = function (page) {
-        if (page < 1 || page > me.totalPage() || page == me.currentPage())
-            return;
-        me.loadData(page);
     }
 
     me.loadData = function (page) {
@@ -990,12 +1237,7 @@ function PagedDataTable(vmOrDataLoader) {
         }
     }
     me.reload = function () {
-        me.loadData(me.currentPage());
-    }
-
-
-    function isFunction(obj) {
-        return typeof obj === "function";
+        me.loadData(me.pagger().currentPage);
     }
 }
 function Dialog() {

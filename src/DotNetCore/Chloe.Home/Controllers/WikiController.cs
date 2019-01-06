@@ -20,6 +20,15 @@ namespace Chloe.Home.Controllers
 
             this.ViewBag.RootNodes = rootNodes;
 
+            if (string.IsNullOrEmpty(id))
+            {
+                id = "1080819355878559744"; //FQA 页面
+                if (!rootNodes.SelectMany(a => a.ChildNodes).Any(a => a.DocumentId == id))
+                {
+                    id = null;
+                }
+            }
+
             string docId = id ?? rootNodes.First().ChildNodes.First().DocumentId;
 
             WikiDocumentDetailModel model = this.CreateService<IWikiDocumentService>().GetDetailModel(docId);

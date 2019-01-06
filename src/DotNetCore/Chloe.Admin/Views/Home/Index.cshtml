@@ -8,12 +8,12 @@
     <link href="~/Content/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="~/Content/font-awesome/font-awesome.min.css" rel="stylesheet" />
     <link href="~/Content/css/framework-theme.css" rel="stylesheet" />
-    <script src="~/Content/jquery/jquery-1.11.1.min.js"></script>
-    <script src="~/Content/bootstrap/bootstrap.min.js"></script>
-    <script src="~/Content/layer/layer.js"></script>
-    <script src="~/Content/jquery/jquery.cookie.js"></script>
-    <script src="~/Content/js/ace.js"></script>
-    <script src="~/Content/js/framework-clientdata.js"></script>
+    <script type="text/javascript" src="~/Content/jquery/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="~/Content/bootstrap/bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/Content/layer/layer.js"></script>
+    <script type="text/javascript" src="~/Content/jquery/jquery.cookie.js"></script>
+    <script type="text/javascript" src="~/Content/js/ace.js"></script>
+    <script type="text/javascript" src="~/Content/js/framework-clientdata.js"></script>
 </head>
 <body style="overflow: hidden;">
     <div id="ajax-loader" style="cursor: progress; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: #fff; z-index: 10000; overflow: hidden;">
@@ -154,8 +154,8 @@
         <div class="loading-shade"></div>
         <div class="loading-content" onclick="$.loading(false)">数据加载中，请稍后…</div>
     </div>
-    @this.RefScript("~/Content/js/index.js")
-    @this.RefScript("~/Content/js/indextab.js")
-    @this.RefScript("~/Content/loading/pace.min.js")
+    <script type="text/javascript" src="/Content/js/index.js"></script>
+    <script type="text/javascript" src="/Content/js/indextab.js"></script>
+    <script type="text/javascript" src="/Content/loading/pace.min.js"></script>
 </body>
 </html>

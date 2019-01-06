@@ -2,20 +2,22 @@
     ViewBag.Title = "Index";
 }
 
-<link href="~/Content/wdtree/tree.css" rel="stylesheet" />
-<script src="~/Content/wdtree/tree.js"></script>
-<link href="~/Content/select2/select2.min.css" rel="stylesheet" />
-<script src="~/Content/select2/select2.min.js"></script>
+<link href="/Content/wdtree/tree.css" rel="stylesheet" />
+<script type="text/javascript" src="/Content/wdtree/tree.js"></script>
+<link href="/Content/select2/select2.min.css" rel="stylesheet" />
+<script type="text/javascript" src="/Content/select2/select2.min.js"></script>
 @this.Partial("Index_js")
 
 <div style="max-width:1000px;">
     <div class="topPanel">
         <div class="toolbar">
             <a class="a-btn-refresh" onclick="$ace.reload()"></a>
-            <button class="a-btn-edit" data-bind="click:edit,disable:!dataTable.selectedModel()">修改</button>
-            <button class="a-btn-add" data-bind="click:add">添加</button>
-            <button class="a-btn-edit" data-bind="click:openRevisePasswordDialog,disable:!dataTable.selectedModel()">重置密码</button>
-            <button class="a-btn-primary fa fa-eye" data-bind="click:assignPermission,disable:!dataTable.selectedModel()">权限设置</button>
+
+            <button permission="system.user.update" class="a-btn-edit" data-bind="click:edit,disable:!dataTable.selectedModel()">修改</button>
+            <button permission="system.user.add" class="a-btn-add" data-bind="click:add">添加</button>
+            <button permission="system.user.revise_password" class="a-btn-edit" data-bind="click:openRevisePasswordDialog,disable:!dataTable.selectedModel()">重置密码</button>
+            <button permission="system.user.set_permission" class="a-btn-primary fa fa-eye" data-bind="click:assignPermission,disable:!dataTable.selectedModel()">权限设置</button>
+
         </div>
         <div class="search">
             <table class="form-table" style="width:400px;">
@@ -71,7 +73,7 @@
                     </td>
                 </tr>
             </tbody>
-            @this.Partial("_tfoot")
+            <pagefoot></pagefoot>
         </table>
     </div>
 </div>

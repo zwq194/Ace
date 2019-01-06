@@ -29,9 +29,10 @@ namespace Ace.Web.Mvc.Authorization
             HttpRequest httpRequest = filterContext.HttpContext.Request;
             if (httpRequest.IsAjaxRequest())
             {
-                Result result = Result.CreateResult(ResultStatus.NotLogin, "未登录或登录超时，请重新登录");
+                Result result = Result.CreateResult(ResultStatus.OK, "未登录或登录超时，请重新登录");
                 string json = JsonHelper.Serialize(result);
                 ContentResult contentResult = new ContentResult() { Content = json };
+                contentResult.StatusCode = 401;
                 filterContext.Result = contentResult;
                 return;
             }

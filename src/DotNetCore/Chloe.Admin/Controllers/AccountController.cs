@@ -74,7 +74,7 @@ namespace Chloe.Admin.Controllers
         {
             //http://www.cnblogs.com/sheng-jie/p/6970091.html
             //https://github.com/aspnetboilerplate/aspnetboilerplate/blob/dev/src/Abp/Events/Bus/EventBus.cs
-            memoryCache.Remove(WebPermissionFilter.USER_PERMITS_CACHE_KEY + this.CurrentSession.UserId);
+            memoryCache.Remove(PermissionCheckHelper.USER_PERMITS_CACHE_KEY + this.CurrentSession.UserId);
             this.CurrentSession = null;
             return RedirectToAction("Login");
         }

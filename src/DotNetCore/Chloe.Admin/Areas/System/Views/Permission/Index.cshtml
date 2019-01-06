@@ -1,18 +1,20 @@
 ﻿@{
     ViewBag.Title = "Index";
 }
-<script src="~/Content/Sortable/Sortable.js"></script>
-<script src="~/Content/js/tree-datatable.js"></script>
+<script type="text/javascript" src="/Content/Sortable/Sortable.js"></script>
+<script type="text/javascript" src="/Content/js/tree-datatable.js"></script>
 @this.Partial("Index_js")
 
 <div style="max-width:1200px;">
     <div class="topPanel">
         <div class="toolbar">
             <a class="a-btn-refresh" onclick="$ace.reload()"></a>
-            <button class="a-btn-edit" data-bind="click:edit,disable:!dataTable.selectedModel()">修改</button>
-            <button class="a-btn-add" data-bind="click:add">添加</button>
-            <button class="a-btn-delete" data-bind="click:del,disable:!dataTable.selectedModel()">删除</button>
-            <button class="a-btn-primary" data-bind="click:saveOrder,disable:!orderChanged()">保存排序</button>
+
+            <button permission="system.permission.update" class="a-btn-edit" data-bind="click:edit,disable:!dataTable.selectedModel()">修改</button>
+            <button permission="system.permission.add" class="a-btn-add" data-bind="click:add">添加</button>
+            <button permission="system.permission.delete" class="a-btn-delete" data-bind="click:del,disable:!dataTable.selectedModel()">删除</button>
+            <button permission="system.permission.update" class="a-btn-primary" data-bind="click:saveOrder,disable:!orderChanged()">保存排序</button>
+
         </div>
         <div class="search">
             <table class="form-table" style="width:400px;">

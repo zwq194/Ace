@@ -22,6 +22,7 @@ namespace Ace.Web.Mvc.Authorization
         }
         public virtual void OnAuthorization(AuthorizationFilterContext filterContext)
         {
+            var httpContext = filterContext.HttpContext;
             if (filterContext.Result != null)
                 return;
 
@@ -46,34 +47,37 @@ namespace Ace.Web.Mvc.Authorization
 
             ResultStatus status = ResultStatus.OK;
             string msg = null;
-            if (filterContext.HttpContext.User.Identity.IsAuthenticated)
+            int responseStatusCode = httpContext.Response.StatusCode;
+            if (httpContext.User.Identity.IsAuthenticated)
             {
                 //说明处于登录状态，则开始验证当前登录用户是否拥有访问权限
                 if (this.HasExecutePermission(filterContext, permissionCodes))
                 {
                     return;
                 }
-                status = ResultStatus.Unauthorized;
+
                 msg = "抱歉，您无当前操作权限";
+                responseStatusCode = 403;
             }
             else
             {
-                status = ResultStatus.NotLogin;
                 msg = "未登录或登录超时，请重新登录";
+                responseStatusCode = 401;
             }
 
-            HttpRequest httpRequest = filterContext.HttpContext.Request;
-            if (status == ResultStatus.Unauthorized || httpRequest.IsAjaxRequest())
+            HttpRequest httpRequest = httpContext.Request;
+            if (httpRequest.IsAjaxRequest() || responseStatusCode == 403)
             {
                 Result result = Result.CreateResult(status, msg);
                 string json = JsonHelper.Serialize(result);
                 ContentResult contentResult = new ContentResult() { Content = json };
+                contentResult.StatusCode = responseStatusCode;
                 filterContext.Result = contentResult;
                 return;
             }
             else
             {
-                string url = filterContext.HttpContext.Content("~/Account/Login");
+                string url = httpContext.Content("~/Account/Login");
                 url = string.Concat(url, "?returnUrl=", httpRequest.Path);
 
                 RedirectResult redirectResult = new RedirectResult(url);

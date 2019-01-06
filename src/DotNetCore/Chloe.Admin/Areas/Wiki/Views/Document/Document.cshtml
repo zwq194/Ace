@@ -2,8 +2,8 @@
     ViewBag.Title = "Document";
 }
 @this.Partial("Document_js")
-@this.RefStyle("~/Content/editormd/css/editormd.min.css")
-@this.RefScript("~/Content/editormd/editormd.js")
+<link href="/Content/editormd/css/editormd.min.css" rel="stylesheet" />
+<script type="text/javascript" src="/Content/editormd/editormd.js"></script>
 
 <br />
 标题：<input class="a-control" type="text" style="width:500px;" data-bind="value:Title" />
