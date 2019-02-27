@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Chloe.Extension" Version="3.0.0" />
     <PackageReference Include="Chloe.MySql" Version="3.4.2" />
-    <PackageReference Include="Chloe.Oracle" Version="3.4.2" />
+    <PackageReference Include="Chloe.Oracle" Version="3.4.3" />
     <PackageReference Include="Chloe.SQLite" Version="3.4.2" />
     <PackageReference Include="Chloe.SqlServer" Version="3.4.2" />
     <PackageReference Include="Chloe.PostgreSQL" Version="3.4.2" />
